@@ -24,7 +24,7 @@ app.post('/test-route', (req, res) => {
 * (this line could be shorter, but using `path.join` and `__dirname`
 * ensures that code will work on Windows, and *nixes/OSX)
 */
-app.use(express.static(path.join(__dirname, '../../client/bears13-frontend/build')));
+app.use(express.static(path.join(__dirname, '../../client/build')));
 
 /**
  * START SERVER
