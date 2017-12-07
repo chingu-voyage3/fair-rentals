@@ -1,17 +1,16 @@
+/* eslint-disable camelcase */
+
 import express from 'express';
 import path from 'path';
+import MongoClient from 'mongodb';
 
 const port = process.env.PORT || 3333;
 const app = express();
+const mongo_url = 'mongodb://localhost:27017/bears13'; // to be switched at production
 
-const bodyParser = require("body-parser");
-const MongoClient = require("mongodb").MongoClient;
-const mongo_url = "http://localhost:20717"; // to be switched at production
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+/* express methods to access req.body */
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 /**
  * A TEST 'get' ROUTE
@@ -34,7 +33,8 @@ app.post('/add-review', (req, res) => {
    *Will that serve as sort of a bodyguard from rouge posts to this address?
    *Or can this only be called outside of this app.post function?
   */
-  MongoClient.connect(mongo_url, (err, db) => {
+  MongoClient.connect(mongo_url, (err, client) => {
+    const db = client.db('bears13'); // new in v3.0 of driver
     if (err) {
       return console.log(err);
     }
@@ -61,27 +61,33 @@ app.post('/add-review', (req, res) => {
 
     db.collection('reviews').insertOne(req.body.review);
     db.collection('reviewers').updateOne(
-      { id: req.body.review.user_id},
-      { $push: {
-        reviews: req.body.review.id
-      }}
+      { id: req.body.review.user_id },
+      {
+        $push: {
+          reviews: req.body.review.id,
+        },
+      },
     );
     db.collection('locations').updateOne(
-      { id: req.body.review.location_id},
-      { $push: {
-        reviews: req.body.review.id
-      }}
+      { id: req.body.review.location_id },
+      {
+        $push: {
+          reviews: req.body.review.id,
+        },
+      },
     );
 
     // So basically a new review object is created
     // And the user who made it and the location
     // the review is about will both receive references to the review
 
-    db.close();
+    client.close();
   });
-
+  // TODO: we can get more into this later, but the problem here is that we get a success message
+  // even if it fails. we need to look at doing the 3 db calls differently... if they
+  // are promise-based, maybe there's something in Promises we can do? To ponder futher...
   res.send('Review added successfully');
-  return console.log("Added a new review for User ID ", req.body.review.user_id);
+  return console.log('Added a new review for User ID ', req.body.review.user_id);
 });
 
 /*
