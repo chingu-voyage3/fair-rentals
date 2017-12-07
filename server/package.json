@@ -21,7 +21,8 @@
   "homepage": "https://github.com/chingu-voyage3/bears-13#readme",
   "dependencies": {
     "backpack-core": "^0.4.3",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "mongodb": "^3.0.0-rc0"
   },
   "devDependencies": {
     "eslint": "^4.12.1",
