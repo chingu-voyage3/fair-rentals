@@ -4,8 +4,14 @@ import path from 'path';
 const port = process.env.PORT || 3333;
 const app = express();
 
+const bodyParser = require("body-parser");
 const MongoClient = require("mongodb").MongoClient;
 const mongo_url = "http://localhost:20717"; // to be switched at production
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 /**
  * A TEST 'get' ROUTE
@@ -70,7 +76,7 @@ app.post('/add-review', (req, res) => {
     // So basically a new review object is created
     // And the user who made it and the location
     // the review is about will both receive references to the review
-    
+
     db.close();
   });
 
