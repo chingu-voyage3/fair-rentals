@@ -102,3 +102,49 @@ app.use(express.static(path.join(__dirname, '../../client/build')));
  * START SERVER
  */
 app.listen(port, () => console.log(`server listening on ${port}`));
+
+//test
+function test_run() {
+  let super_mongo;
+  return MongoClient.connect(mongo_url).then(client => {
+    console.log('Connected to MongoDB successfully');
+    super_mongo = client.db('bears13');
+    return super_mongo.collection('reviews').insertOne(
+      {location: "Pizza Hut", review : "Good"})
+      .then(()=>{
+        console.log('First review added succesfully');
+         return super_mongo.collection('reviews').updateOne(
+          {location : "Pizza Hut"},
+          { $set: { review : "Great!"}}
+        ).then(()=>{
+          console.log('First update completed succesfully');
+          return super_mongo.collection('reviews').updateOne(
+            {location : "Pizza Hut"},
+            { $set: { location : "Papa Johns"}}
+          ).then(()=>{
+            console.log('Second update completed. Closing connection.')
+            client.close();
+            //Res.send('Mission Accomplished');
+          }, (err)=>{
+            return console.log(err);
+            client.close();
+            //Res.send('Oh no, the last update failed');
+          });
+        }, (err)=>{
+          return console.log(err);
+          client.close();
+          //Res.send('Oh no, the first update failed');
+        })
+      },
+      (err)=>{
+        return console.log(err);
+        client.close();
+        //Res.send('Oh no, the insert failed');
+      });
+  },(err)=>{
+    return console.log(err);
+    client.close();
+    //Res.send('Oh no, the connection failed');
+  })
+};
+test_run();
