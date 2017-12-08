@@ -120,7 +120,7 @@ function test_run() {
           console.log('First update completed succesfully');
           return super_mongo.collection('reviews').updateOne(
             {location : "Pizza Hut"},
-            { $set: { review : "Great!"}}
+            { $set: { location : "Papa Johns"}}
           ).then(()=>{
             console.log('Second update completed. Closing connection.')
             client.close();
