@@ -149,7 +149,7 @@ function add_review(data) {
   });
 };
 
-function add_new_location(db, data){
+function add_new_location(db, data) {
   let addition = db.collection('locations').insertOne({
     id : data.id, address : data.address, name : data.name, reviews : [], scores : []
   }).then(() => {
@@ -172,7 +172,7 @@ function add_new_location(db, data){
   whereas the add_review function creates its own MongoClient connection.
 */
 
-function add_new_reviewer(db, data){
+function add_new_reviewer (db, data) {
   let addition = db.collection('reviewers').insertOne({
     id : data.id, name : data.name, reviews : [], avatar : ""
   }).then(() => {
@@ -188,7 +188,7 @@ function add_new_reviewer(db, data){
 //to load the image.
 //The avatars could be on our server or from a friendly CDN.
 
-function add_starter_data_to_db(){
+const add_starter_data_to_db = async () => {
   let sample_location = {
     id : 1,
     name : "Taco Bell",
@@ -199,21 +199,15 @@ function add_starter_data_to_db(){
     id : 1,
     name : "John Smith"
   };
-
-  MongoClient.connect(mongo_url, (err, client) => {
-    if (err) {
-      return console.log('Connection failed.', err);
-    }
-    console.log('Connected to MongoDB');
-    const db = client.db('bears13');
-
-    add_new_location(db, sample_location)
-      .then(add_new_reviewer(db, sample_reviewer))
-        .then(() => {
-          console.log("Closing connection.");
-          client.close();
-        });
+  let db;
+  let super_client;
+  await MongoClient.connect(mongo_url).then(client => {
+    db = client.db('bears13');
+    super_client = client;
   });
+  await add_new_location(db, sample_location);
+  await add_new_reviewer(db, sample_reviewer);
+  await super_client.close();
 
 };
 
@@ -225,7 +219,10 @@ let sample_data = {
   review_score : 8
 };
 
-add_starter_data_to_db();
+add_starter_data_to_db().then(()=>{
+  console.log("Starter data added.");
+});
+
 setTimeout(()=>{
   add_review(sample_data);
 }, 1000);
