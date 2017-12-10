@@ -104,39 +104,6 @@ app.use(express.static(path.join(__dirname, '../../client/build')));
 app.listen(port, () => console.log(`server listening on ${port}`));
 
 //test
-function add_starter_data_to_db(){
-  let super_mongo;
-  return MongoClient.connect(mongo_url).then(client => {
-    console.log('Connected to MongoDB successfully.');
-    super_mongo = client.db('bears13');
-    return super_mongo.collection('reviewers').insertOne(
-      {reviewer_id : 1, reviews : []}
-    ).then(()=>{
-      console.log('Reviewer added successfully.');
-      return super_mongo.collection('locations').insertOne(
-        {location_id : 1, reviews : [], scores : []}
-      ).then(()=>{
-        console.log('Location added successfully. Closing connection.');
-        return client.close();
-      }, (err) => {
-        //location insert failed
-        console.log('Location insert failed');
-        client.close();
-        return console.log(err);
-      });
-    }, (err) => {
-      //reviewer insert failed
-      console.log('Reviewer insert failed');
-      client.close()
-      return console.log(err);
-    });
-  }, (err) => {
-    //connection failed
-    console.log('Connection failed');
-    client.close()
-    return console.log(err);
-  });
-};
 
 function add_review(data) {
   let super_mongo;
@@ -153,7 +120,7 @@ function add_review(data) {
         ).then(()=>{
           console.log('First update completed succesfully');
           return super_mongo.collection('locations').updateOne(
-            {location_id : data.location_id},
+            {id : data.location_id},
             { $push: { reviews : data.review_id, scores : data.review_score}}
           ).then(()=>{
             console.log('Second update completed. Closing connection.')
@@ -180,6 +147,71 @@ function add_review(data) {
     //Res.send('Oh no, the connection failed');
     return console.log(err);
   });
+};
+
+function add_new_location(db, data){
+  let addition = db.collection('locations').insertOne({
+    id : data.id, address : data.address, name : data.name, reviews : [], scores : []
+  }).then(() => {
+    console.log('Location added successfully.');
+  }, (err) => {
+    client.close();
+    return ('Location insertion failed.', err);
+  });
+  return addition;
+};
+/*
+  The add_new_location/reviewer function is also compatible with promises.
+  I just wanted a function to add locations without having to rewrite everything
+  every time.
+  I'm not sure how well this will work once posts get involved, but it works fine
+  for testing.
+*/
+
+function add_new_reviewer(db, data){
+  let addition = db.collection('reviewers').insertOne({
+    id : data.id, name : data.name, reviews : [], avatar : ""
+  }).then(() => {
+    console.log('Reviewer added successfully.');
+  }, (err) => {
+    client.close();
+    return ('Reviewer insertion failed.', err);
+  });
+  return addition;
+};
+
+//I think we could just use a url as the avatar and then use that later
+//to load the image.
+//The avatars could be on our server or from a friendly CDN.
+
+function add_starter_data_to_db(){
+  let sample_location = {
+    id : 1,
+    name : "Taco Bell",
+    address : "1234 Main St.",
+  };
+
+  let sample_reviewer = {
+    id : 1,
+    name : "John Smith"
+  };
+
+  MongoClient.connect(mongo_url, (err, client) => {
+    if (err) {
+      client.close();
+      return console.log('Connection failed.', err);
+    }
+    console.log('Connected to MongoDB');
+    const db = client.db('bears13');
+
+    add_new_location(db, sample_location)
+      .then(add_new_reviewer(db, sample_reviewer))
+        .then(() => {
+          console.log("Closing connection.");
+          client.close();
+        });
+  });
+
 };
 
 let sample_data = {
