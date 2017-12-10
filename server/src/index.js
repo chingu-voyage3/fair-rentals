@@ -202,7 +202,6 @@ function add_starter_data_to_db(){
 
   MongoClient.connect(mongo_url, (err, client) => {
     if (err) {
-      client.close();
       return console.log('Connection failed.', err);
     }
     console.log('Connected to MongoDB');
