@@ -166,6 +166,10 @@ function add_new_location(db, data){
   every time.
   I'm not sure how well this will work once posts get involved, but it works fine
   for testing.
+
+  These two functions are different from the add review function above becuse they
+  have to be used within the callback of a MongoClient.connect method,
+  whereas the add_review function creates its own MongoClient connection.
 */
 
 function add_new_reviewer(db, data){
