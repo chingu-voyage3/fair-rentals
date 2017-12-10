@@ -104,47 +104,93 @@ app.use(express.static(path.join(__dirname, '../../client/build')));
 app.listen(port, () => console.log(`server listening on ${port}`));
 
 //test
-function test_run() {
+function add_starter_data_to_db(){
+  let super_mongo;
+  return MongoClient.connect(mongo_url).then(client => {
+    console.log('Connected to MongoDB successfully.');
+    super_mongo = client.db('bears13');
+    return super_mongo.collection('reviewers').insertOne(
+      {reviewer_id : 1, reviews : []}
+    ).then(()=>{
+      console.log('Reviewer added successfully.');
+      return super_mongo.collection('locations').insertOne(
+        {location_id : 1, reviews : [], scores : []}
+      ).then(()=>{
+        console.log('Location added successfully. Closing connection.');
+        return client.close();
+      }, (err) => {
+        //location insert failed
+        console.log('Location insert failed');
+        client.close();
+        return console.log(err);
+      });
+    }, (err) => {
+      //reviewer insert failed
+      console.log('Reviewer insert failed');
+      client.close()
+      return console.log(err);
+    });
+  }, (err) => {
+    //connection failed
+    console.log('Connection failed');
+    client.close()
+    return console.log(err);
+  });
+};
+
+function add_review(data) {
   let super_mongo;
   return MongoClient.connect(mongo_url).then(client => {
     console.log('Connected to MongoDB successfully');
     super_mongo = client.db('bears13');
     return super_mongo.collection('reviews').insertOne(
-      {location: "Pizza Hut", review : "Good"})
+      {location_id: data.location_id, review : data.review_text, id : data.review_id})
       .then(()=>{
         console.log('First review added succesfully');
-         return super_mongo.collection('reviews').updateOne(
-          {location : "Pizza Hut"},
-          { $set: { review : "Great!"}}
+         return super_mongo.collection('reviewers').updateOne(
+          {id : data.reviewer_id},
+          { $push: { reviews : data.review_id}}
         ).then(()=>{
           console.log('First update completed succesfully');
-          return super_mongo.collection('reviews').updateOne(
-            {location : "Pizza Hut"},
-            { $set: { location : "Papa Johns"}}
+          return super_mongo.collection('locations').updateOne(
+            {location_id : data.location_id},
+            { $push: { reviews : data.review_id, scores : data.review_score}}
           ).then(()=>{
             console.log('Second update completed. Closing connection.')
-            client.close();
+            return client.close();
             //Res.send('Mission Accomplished');
           }, (err)=>{
-            return console.log(err);
             client.close();
             //Res.send('Oh no, the last update failed');
+            return console.log(err);
           });
         }, (err)=>{
-          return console.log(err);
           client.close();
           //Res.send('Oh no, the first update failed');
-        })
+          return console.log(err);
+        });
       },
       (err)=>{
-        return console.log(err);
         client.close();
         //Res.send('Oh no, the insert failed');
+        return console.log(err);
       });
   },(err)=>{
-    return console.log(err);
     client.close();
     //Res.send('Oh no, the connection failed');
-  })
+    return console.log(err);
+  });
 };
-test_run();
+
+let sample_data = {
+  review_id : 1,
+  location_id : 1,
+  reviewer_id : 1,
+  review_text : "Very good.",
+  review_score : 8
+};
+
+add_starter_data_to_db();
+setTimeout(()=>{
+  add_review(sample_data);
+}, 1000);
