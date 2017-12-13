@@ -166,8 +166,8 @@ function add_new_reviewer (db, client, data) {
     id : data.id,
     name : data.name,
     reviews : [],
-    avatar : "",
-    registered : ""
+    avatar : data.avatar,
+    registered : data.registered
   }).then(() => {
     console.log('Reviewer added successfully.');
   }, (err) => {
