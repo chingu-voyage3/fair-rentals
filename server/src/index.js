@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+/* eslint-disable camelcase, no-console */
 
 import express from 'express';
 import path from 'path';
@@ -103,51 +103,52 @@ app.use(express.static(path.join(__dirname, '../../client/build')));
  */
 app.listen(port, () => console.log(`server listening on ${port}`));
 
-//test
+// test
 
 function add_review(data) {
   let super_mongo;
-  return MongoClient.connect(mongo_url).then(client => {
+  return MongoClient.connect(mongo_url).then((client) => {
     console.log('Connected to MongoDB successfully');
     super_mongo = client.db('bears13');
-    return super_mongo.collection('reviews').insertOne(
-      {location_id: data.location_id, review : data.review_text, id : data.review_id})
-      .then(()=>{
-        console.log('First review added succesfully');
-         return super_mongo.collection('reviewers').updateOne(
-          {id : data.reviewer_id},
-          { $push: { reviews : data.review_id}}
-        ).then(()=>{
-          console.log('First update completed succesfully');
-          return super_mongo.collection('locations').updateOne(
-            {id : data.location_id},
-            { $push: { reviews : data.review_id, scores : data.review_score}}
-          ).then(()=>{
-            console.log('Second update completed. Closing connection.')
-            return client.close();
-            //Res.send('Mission Accomplished');
-          }, (err)=>{
+    return super_mongo.collection('reviews').insertOne({ location_id: data.location_id, review: data.review_text, id: data.review_id })
+      .then(
+        () => {
+          console.log('First review added succesfully');
+          return super_mongo.collection('reviewers').updateOne(
+            { id: data.reviewer_id },
+            { $push: { reviews: data.review_id } },
+          ).then(() => {
+            console.log('First update completed succesfully');
+            return super_mongo.collection('locations').updateOne(
+              { id: data.location_id },
+              { $push: { reviews: data.review_id, scores: data.review_score } },
+            ).then(() => {
+              console.log('Second update completed. Closing connection.');
+              return client.close();
+            // Res.send('Mission Accomplished');
+            }, (err) => {
+              client.close();
+              // Res.send('Oh no, the last update failed');
+              return console.log(err);
+            });
+          }, (err) => {
             client.close();
-            //Res.send('Oh no, the last update failed');
+            // Res.send('Oh no, the first update failed');
             return console.log(err);
           });
-        }, (err)=>{
+        },
+        (err) => {
           client.close();
-          //Res.send('Oh no, the first update failed');
+          // Res.send('Oh no, the insert failed');
           return console.log(err);
-        });
-      },
-      (err)=>{
-        client.close();
-        //Res.send('Oh no, the insert failed');
-        return console.log(err);
-      });
-  },(err)=>{
+        },
+      );
+  }, (err) => {
     client.close();
-    //Res.send('Oh no, the connection failed');
+    // Res.send('Oh no, the connection failed');
     return console.log(err);
   });
-};
+}
 
 function add_new_location(db, data) {
   let addition = db.collection('locations').insertOne({
@@ -159,7 +160,7 @@ function add_new_location(db, data) {
     return ('Location insertion failed.', err);
   });
   return addition;
-};
+}
 /*
   The add_new_location/reviewer function is also compatible with promises.
   I just wanted a function to add locations without having to rewrite everything
@@ -182,11 +183,11 @@ function add_new_reviewer (db, data) {
     return ('Reviewer insertion failed.', err);
   });
   return addition;
-};
+}
 
-//I think we could just use a url as the avatar and then use that later
-//to load the image.
-//The avatars could be on our server or from a friendly CDN.
+// I think we could just use a url as the avatar and then use that later
+// to load the image.
+// The avatars could be on our server or from a friendly CDN.
 
 const add_starter_data_to_db = async () => {
   let sample_location = {
@@ -195,9 +196,9 @@ const add_starter_data_to_db = async () => {
     address : "1234 Main St.",
   };
 
-  let sample_reviewer = {
-    id : 1,
-    name : "John Smith"
+  const sample_reviewer = {
+    id: 1,
+    name: 'John Smith',
   };
   let db;
   let super_client;
