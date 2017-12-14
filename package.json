@@ -5,9 +5,12 @@
   "main": "./src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "backpack",
-    "build": "backpack build",
-    "start": "npm run build && node ./build/main.js"
+    "build-server": "backpack build",
+    "build-client": "npm run build --prefix client",
+    "client": "npm run start --prefix client",
+    "server": "backpack",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "npm run build-server && npm run build-client && node ./build/main.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +24,7 @@
   "homepage": "https://github.com/chingu-voyage3/bears-13#readme",
   "dependencies": {
     "backpack-core": "^0.4.3",
+    "concurrently": "^3.5.1",
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "mongodb": "^3.0.0-rc0"
