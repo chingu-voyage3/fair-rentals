@@ -14,43 +14,33 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/add-review', (req, res) => {
-  /*
-  * to secure this route, I suspect we'll have to use some sort of authentication code;
-  * probably a JSONWebToken that an authenticated client sends back in `req.header`. But T.B.D.
-  */
-  MongoClient.connect(mongo_url, (err, client) => {
-    const db = client.db('bears13');
-    if (err) {
-      return console.log(err);
-    }
-    db.collection('reviews').insertOne(req.body.review);
-    db.collection('reviewers').updateOne(
-      { id: req.body.review.user_id },
-      {
-        $push: {
-          reviews: req.body.review.id,
-        },
-      },
-    );
-    db.collection('locations').updateOne(
-      { id: req.body.review.location_id },
-      {
-        $push: {
-          reviews: req.body.review.id,
-        },
-      },
-    );
-    return client.close();
-  });
-  res.send('Review added successfully');
-  return console.log('Added a new review for User ID ', req.body.review.user_id);
-});
-
 /*
 * STATIC ROUTE TO SERVE FRONT-END REACT APP
 */
 app.use(express.static(path.join(__dirname, '../client/build')));
+
+app.post('/add-review', async (req, res, next) => {
+  /*
+  * to secure this route, I suspect we'll have to use some sort of authentication code;
+  * probably a JSONWebToken that an authenticated client sends back in `req.header`. But T.B.D.
+  */
+  try {
+    let db;
+    let super_client;
+    await MongoClient.connect(mongo_url).then((client) => {
+      db = client.db('bears13');
+      super_client = client;
+    });
+    await add_new_review(db, super_client, req.body);
+    await super_client.close();
+    res.send('Review added successfully');
+    return console.log('Added a new review for User ID ', req.body.user_id);
+  }
+  catch (err) {
+    // next(err)?
+    return console.log(err);
+  }
+});
 
 /**
  * START SERVER
