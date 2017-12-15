@@ -14,6 +14,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+/*
+* STATIC ROUTE TO SERVE FRONT-END REACT APP
+*/
+app.use(express.static(path.join(__dirname, '../client/build')));
+
 app.post('/add-review', async (req, res, next) => {
   /*
   * to secure this route, I suspect we'll have to use some sort of authentication code;
@@ -26,21 +31,16 @@ app.post('/add-review', async (req, res, next) => {
       db = client.db('bears13');
       super_client = client;
     });
-    await add_new_review(db, super_client, req.body.new_review);
+    await add_new_review(db, super_client, req.body);
     await super_client.close();
     res.send('Review added successfully');
-    return console.log('Added a new review for User ID ', req.body.new_review.user_id);
+    return console.log('Added a new review for User ID ', req.body.user_id);
   }
   catch (err) {
     // next(err)?
     return console.log(err);
   }
 });
-
-/*
-* STATIC ROUTE TO SERVE FRONT-END REACT APP
-*/
-app.use(express.static(path.join(__dirname, '../../client/build')));
 
 /**
  * START SERVER

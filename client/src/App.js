@@ -11,6 +11,7 @@ import Signup from './containers/Signup';
 import User from './containers/User';
 import Property from './containers/Property';
 import FourOhFour from './containers/FourOhFour';
+import Tester from './containers/TEST-Add-Review';
 
 const Links = () => (
   <nav>
@@ -34,6 +35,7 @@ const App = () => (
         <Route path="/signup" component={Signup} />
         <Route path="/search" component={Search} />
         <Route path="/contact" render={() => <h1>Contact...</h1>} />
+        <Route path="/tester" component={Tester} />
         <Route
           path="/property/:prop_id"
           render={({ match }) => <Property id={match.params.prop_id} />}
