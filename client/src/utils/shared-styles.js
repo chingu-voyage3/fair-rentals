@@ -48,7 +48,7 @@ export const Label = styled.label`
 
 export const CredentialForm = styled.form`
   width: 100%;
-  padding: 10%;
+  min-height: 400px;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
