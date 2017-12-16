@@ -1,6 +1,6 @@
 import React from 'react';
-import Property from '../containers/Property';
-import Loading from '../containers/Loading';
+import Property from '../Property/Property';
+import Loading from '../../utils/Loading';
 // import axios from 'axios';
 
 import './searchform.css';
@@ -16,14 +16,14 @@ const mockedProperty = {
       id: 222,
       user_id: 111,
       text: 'Cheap and friendly.',
-      score: 4,
+      stars: 4,
     },
     {
       id: 333,
       user_id: 101,
       text:
         'A good deal but not very fancy. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. ',
-      score: 3,
+      stars: 3,
     },
   ],
 };
