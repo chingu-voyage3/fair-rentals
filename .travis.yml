@@ -1,6 +1,9 @@
 {
   "language": "node_js",
   "node_js": "lts/*",
+  "before_install": [
+    "npm install --prefix client"
+  ],
   "cache": {
     "directories": [
       "node_modules",
