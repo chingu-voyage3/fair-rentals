@@ -10,7 +10,7 @@ import Signup from './containers/Signup';
 import User from './containers/User';
 import Property from './containers/Property/Property';
 import FourOhFour from './utils/FourOhFour';
-import AddReview from './containers/AddReview';
+import AddReview from './containers/AddReview/AddReview';
 
 const Links = () => (
   <nav>

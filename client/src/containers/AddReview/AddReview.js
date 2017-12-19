@@ -3,8 +3,8 @@ import axios from 'axios';
 import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 
-import Loading from '../utils/Loading';
-import { BigDiv, Button } from '../utils/shared-styles';
+import Loading from '../../utils/Loading';
+import { BigDiv, Button } from '../../utils/shared-styles';
 
 const ReviewForm = styled.form`
   width: 100%;
