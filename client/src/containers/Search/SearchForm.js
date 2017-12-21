@@ -14,13 +14,15 @@ const mockedProperty = {
   reviews: [
     {
       id: 222,
-      user_id: 111,
+      reviewer_id: 111,
+      reviewer_name: 'Bort',
       text: 'Cheap and friendly.',
       stars: 4,
     },
     {
       id: 333,
-      user_id: 101,
+      reviewer_id: 101,
+      reviewer_name: 'Bart',
       text:
         'A good deal but not very fancy. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. ',
       stars: 3,

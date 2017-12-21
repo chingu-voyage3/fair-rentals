@@ -19,8 +19,9 @@ nav {
 
 @media screen and (max-width: 450px) {
   nav {
-    justify-content: space-between;
+    justify-content: space-around;
     font-size: 0.75rem;
+    padding: 1rem 0 0 0;
   }
 }
 

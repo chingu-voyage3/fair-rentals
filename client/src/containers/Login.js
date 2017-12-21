@@ -1,66 +1,48 @@
+/* eslint-disable react/forbid-prop-types */
 import React from 'react';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
-import {
-  BigDiv,
-  MedText,
-  Button,
-  Label,
-  CredentialForm,
-  CredentialFormInput,
-} from '../utils/shared-styles';
+const AuthBtnWrap = styled.div`
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0em 0.5em 0em 0.5em;
+`;
+
+const AuthBtn = styled.button`
+  border: none;
+  margin: 0.25rem;
+  text-decoration: none;
+  color: steelblue;
+  font: 1rem 'Barlow Semi Condensed', Helvetica, sans-serif;
+  cursor: pointer;
+`;
 
 class Login extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      username: '',
-      password: '',
-      message: '',
-    };
-    this.submitCredentials = this.submitCredentials.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-  }
-  submitCredentials(e) {
-    e.preventDefault();
-    // TODO: this needs to be lifted up? so result can be spread around components?
-    const { username, password } = this.state;
-    if (!username || !password) {
-      this.setState({ message: 'Blank fields not allowed' });
-      setTimeout(() => {
-        this.setState({ message: '' });
-      }, 2000);
-    }
-  }
-  handleChange(e) {
-    e.preventDefault();
-    this.setState({ [e.target.name]: e.target.value });
-  }
+  login = () => {
+    this.props.auth.login();
+  };
+
+  logout = () => {
+    this.props.auth.logout();
+  };
+
   render() {
-    const { username, password, message } = this.state;
+    const { isAuthenticated } = this.props.auth;
     return (
-      <BigDiv>
-        <MedText>Log In</MedText>
-        <CredentialForm onSubmit={this.submitCredentials}>
-          <Label htmlFor="username">Username:</Label>
-          <CredentialFormInput
-            type="text"
-            name="username"
-            value={username}
-            onChange={this.handleChange}
-          />
-          <Label htmlFor="password">Password:</Label>
-          <CredentialFormInput
-            type="password"
-            name="password"
-            value={password}
-            onChange={this.handleChange}
-          />
-          <Button type="submit">Log In</Button>
-          <p style={{ color: 'indianred' }}>{message}</p>
-        </CredentialForm>
-      </BigDiv>
+      <AuthBtnWrap>
+        {!isAuthenticated() && <AuthBtn onClick={this.login}>Log In</AuthBtn>}
+        {isAuthenticated() && <AuthBtn onClick={this.logout}>Log Out</AuthBtn>}
+      </AuthBtnWrap>
     );
   }
 }
+
+Login.propTypes = {
+  auth: PropTypes.object.isRequired,
+};
 
 export default Login;

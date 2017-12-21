@@ -10,8 +10,9 @@ const Review = ({ rev, index }) => {
   let topLine;
   if (rev.location_name) {
     topLine = `${rev.location_name}:`;
-  } else if (rev.user_id) {
-    topLine = `User #${rev.user_id} says:`;
+  } else if (rev.reviewer_name) {
+    // TODO: revisit this
+    topLine = `${rev.reviewer_name} says:`;
   }
   return (
     <div style={{ animationDelay: `${timing}s` }} className="review-wrap">
@@ -25,8 +26,10 @@ const Review = ({ rev, index }) => {
 Review.propTypes = {
   index: PropTypes.number.isRequired,
   rev: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    user_id: PropTypes.number,
+    review_id: PropTypes.number,
+    reviewer_name: PropTypes.string,
+    reviewer_id: PropTypes.number,
+    location_name: PropTypes.string,
     location_id: PropTypes.number,
     text: PropTypes.string.isRequired,
     stars: PropTypes.number.isRequired,

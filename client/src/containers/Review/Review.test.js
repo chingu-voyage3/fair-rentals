@@ -14,7 +14,7 @@ const rev = {
 describe('Review displays a review', () => {
   let tree;
   beforeAll(() => {
-    const component = renderer.create(<Review key={rev.id} rev={rev} index={0} />);
+    const component = renderer.create(<Review key={rev.review_id} rev={rev} index={0} />);
     tree = component.toJSON();
   });
   it('should render', () => {

@@ -16,7 +16,11 @@
     "react-test-renderer": "^16.2.0"
   },
   "dependencies": {
+    "auth0-js": "^8.12.1",
     "axios": "^0.17.1",
+    "history": "^4.7.2",
+    "jest-localstorage-mock": "^2.1.0",
+    "jwt-decode": "^2.2.0",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",

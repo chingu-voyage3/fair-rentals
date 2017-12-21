@@ -12,7 +12,11 @@ class FourOhFour extends React.Component {
     return (
       <BigDiv>
         <p>You found it. The 404.</p>
-        <img style={{ height: '20em', borderRadius: '10%' }} src={Pic404} alt="power equipment with the number 404" />
+        <img
+          style={{ height: '20em', borderRadius: '10%' }}
+          src={Pic404}
+          alt="power equipment with the number 404"
+        />
       </BigDiv>
     );
   }
