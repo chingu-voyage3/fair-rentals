@@ -3,6 +3,12 @@
 import express from 'express';
 import path from 'path';
 import MongoClient from 'mongodb';
+import graphql from 'graphql';
+import graphqlHTTP from 'express-graphql';
+import mongoose from 'mongoose';
+mongoose.Promise = global.Promise;
+
+import {schema} from './types';
 
 require('dotenv').config(); // makes a variable in .env file available at `process.env.VARIABLE`
 
@@ -18,6 +24,11 @@ app.use(express.urlencoded({ extended: true }));
 * STATIC ROUTE TO SERVE FRONT-END REACT APP
 */
 app.use(express.static(path.join(__dirname, '../client/build')));
+
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  graphiql: true,
+}));
 
 app.post('/add-review', async (req, res, next) => {
   /*
@@ -35,7 +46,8 @@ app.post('/add-review', async (req, res, next) => {
     await super_client.close();
     res.send('Review added successfully');
     return console.log('Added a new review for User ID ', req.body.user_id);
-  } catch (err) {
+  }
+  catch (err) {
     // next(err)?
     return console.log(err);
   }
@@ -107,21 +119,17 @@ function add_new_location(db, client, data) {
     );
   return addition;
 }
-/*
-  The add_new_location/reviewer function is also compatible with promises.
-  I just wanted a function to add locations without having to rewrite everything
-  every time.
-  I'm not sure how well this will work once posts get involved, but it works fine
-  for testing.
-
-*/
-const find_existing_reviewer = (db, client, data) =>
-  db.collection('reviewers').findOne({ auth_id: data });
 
 function add_new_reviewer(db, client, data) {
   const addition = db
     .collection('reviewers')
-    .insertOne(data) // can i get away with this? identical objects
+    .insertOne({
+      id: data.id,
+      name: data.name,
+      reviews: [],
+      avatar: data.avatar,
+      registered: data.registered,
+    })
     .then(
       () => {
         console.log('Reviewer added successfully.');
@@ -132,97 +140,47 @@ function add_new_reviewer(db, client, data) {
       },
     );
   return addition;
-}
+};
 
-app.post('/add-reviewer', async (req, res) => {
-  const { auth_id, name, avatar } = req.body;
-  console.log(req.body);
-  const avatarToSave = avatar || 'http://voice4thought.org/wp-content/uploads/2016/08/default1.jpg';
-  const newUser = {
-    auth_id,
-    name,
-    avatar: avatarToSave,
-    registered: new Date(),
-    reviews: [],
+/*
+const add_starter_data_to_db = async () => {
+  const sample_location = {
+    id: 1,
+    name: 'Taco Bell',
+    geo: { type: 'Point', coordinates: [-73.97, 40.77] },
+    avatar: 'http://cdn.freshome.com/wp-content/uploads/2007/10/tetris-apartments2.jpg',
   };
-  try {
-    let db;
-    let super_client;
-    await MongoClient.connect(mongo_url).then((client) => {
-      db = client.db('bears13');
-      super_client = client;
-    });
-    const user = await add_new_reviewer(db, super_client, newUser);
-    // fn above this line doesn't actually return the new user. `user` is undef
-    return res.send(newUser);
-  } catch (err) {
-    return res.send({ message: `Error adding profile: ${err}` });
-  }
+
+  const sample_reviewer = {
+    id: 1,
+    name: 'John Smith',
+    reviews: [],
+    avatar: 'https://i.ytimg.com/vi/oHg5SJYRHA0/hqdefault.jpg',
+    registered: 'Tue Dec 12 2017 21:28:32 GMT-0700 (US Mountain Standard Time)',
+  };
+
+  const sample_review = {
+    id: 1,
+    user_id: 1,
+    location_id: 1,
+    text: "I will go there again, even though it's not that great",
+    score: 4,
+  };
+
+  let db;
+  let super_client;
+  await MongoClient.connect(mongo_url).then((client) => {
+    db = client.db('bears13');
+    super_client = client;
+  });
+  await add_new_location(db, super_client, sample_location);
+  await add_new_reviewer(db, super_client, sample_reviewer);
+  await add_new_review(db, super_client, sample_review);
+  await super_client.close();
+};
+
+add_starter_data_to_db().then(() => {
+  console.log('Starter data added.');
 });
 
-app.get('/profile', async (req, res) => {
-  try {
-    let db;
-    let super_client;
-    await MongoClient.connect(mongo_url).then((client) => {
-      db = client.db('bears13');
-      super_client = client;
-    });
-    const user = await find_existing_reviewer(db, super_client, req.query.sub);
-    return res.send({ user });
-  } catch (err) {
-    return res.send({ message: `Error getting profile: ${err}` });
-  }
-});
-
-// I think we could just use a url as the avatar and then use that later
-// to load the image.
-// The avatars could be on our server or from a friendly CDN.
-
-/**
- * TURNING TESTS OFF (but not deleting yet)
- *
- */
-// const add_starter_data_to_db = async () => {
-//   const sample_location = {
-//     location_name: 'Taco Bell',
-//     geo: { type: 'Point', coordinates: [-73.97, 40.77] },
-//     reviews: [1], // array will contain _ids from review in db.collection('reviews')
-//   };
-
-//   const sample_reviewer = {
-//     auth_id: 'google-oauth2|999999999999999999999',
-//     name: 'John Smith',
-//     reviews: [1], // array will contain _ids from review in db.collection('reviews')
-//     avatar: 'https://i.ytimg.com/vi/oHg5SJYRHA0/hqdefault.jpg',
-//     registered: 'Tue Dec 12 2017 21:28:32 GMT-0700 (US Mountain Standard Time)',
-//   };
-
-//   const sample_review = {
-//     reviewer_id: 1, // in app this will be the _id from db.collection('reviewers')
-//     location_id: 1, // in app this will be the _id from db.collection('locations')
-//     location_name: 'Taco Bell',
-//     text: "I will go there again, even though it's not that great",
-//     stars: 4,
-//   };
-
-//   let db;
-//   let super_client;
-//   await MongoClient.connect(mongo_url).then((client) => {
-//     db = client.db('bears13');
-//     super_client = client;
-//   });
-//   await add_new_location(db, super_client, sample_location);
-//   await add_new_reviewer(db, super_client, sample_reviewer);
-//   await add_new_review(db, super_client, sample_review);
-//   /*
-//   await db.collection('locations').find().forEach((location) => {
-//     console.log(location);
-//   });
-//   */
-//   await super_client.close();
-// };
-
-// add_starter_data_to_db().then(() => {
-//   console.log('Starter data added.');
-// });
+*/
