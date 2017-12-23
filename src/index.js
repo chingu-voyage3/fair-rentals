@@ -63,13 +63,7 @@ app.listen(port, () => console.log(`server listening on ${port}`));
 function add_new_review(db, client, data) {
   const addition = db
     .collection('reviews')
-    .insertOne({
-      id: data.id,
-      user_id: data.user_id,
-      text: data.text,
-      score: data.score,
-      location_id: data.location_id,
-    })
+    .insertOne({...data})
     .then(
       db
         .collection('locations')
@@ -101,13 +95,7 @@ function add_new_review(db, client, data) {
 function add_new_location(db, client, data) {
   const addition = db
     .collection('locations')
-    .insertOne({
-      id: data.id,
-      geo: data.geo,
-      name: data.name,
-      avatar: data.avatar,
-      reviews: [],
-    })
+    .insertOne({...data})
     .then(
       () => {
         console.log('Location added successfully.');
@@ -123,13 +111,7 @@ function add_new_location(db, client, data) {
 function add_new_reviewer(db, client, data) {
   const addition = db
     .collection('reviewers')
-    .insertOne({
-      id: data.id,
-      name: data.name,
-      reviews: [],
-      avatar: data.avatar,
-      registered: data.registered,
-    })
+    .insertOne({...data})
     .then(
       () => {
         console.log('Reviewer added successfully.');
@@ -142,7 +124,7 @@ function add_new_reviewer(db, client, data) {
   return addition;
 };
 
-/*
+
 const add_starter_data_to_db = async () => {
   const sample_location = {
     id: 1,
@@ -182,5 +164,3 @@ const add_starter_data_to_db = async () => {
 add_starter_data_to_db().then(() => {
   console.log('Starter data added.');
 });
-
-*/
