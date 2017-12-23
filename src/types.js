@@ -1,8 +1,8 @@
 import createType from 'mongoose-schema-to-graphql';
 import mongoose from 'mongoose';
 const graphql = require("graphql");
-
-const mongo_url = 'mongodb://bears13:chingu13@ds141406.mlab.com:41406/bears13';
+require('dotenv').config();
+const mongo_url = process.env.MONGO_URL;
 
 import {ReviewSchema} from './schemas';
 import {UserSchema} from './schemas';
