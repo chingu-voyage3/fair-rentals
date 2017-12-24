@@ -111,7 +111,12 @@ const query = new graphql.GraphQLObjectType({
             console.log(err);
           }
         };
-        await finder(id);
+        await finder(id)
+        .then(()=>{
+          if (found_location.geo) {
+            found_location.geo = JSON.stringify(found_location.geo);
+          }
+        });
         return found_location;
       }
     },
