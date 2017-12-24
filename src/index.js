@@ -31,10 +31,6 @@ app.use('/graphql', graphqlHTTP({
 }));
 
 app.post('/add-review', async (req, res, next) => {
-  /*
-  * to secure this route, I suspect we'll have to use some sort of authentication code;
-  * probably a JSONWebToken that an authenticated client sends back in `req.header`. But T.B.D.
-  */
   try {
     let db;
     let super_client;
@@ -108,6 +104,9 @@ function add_new_location(db, client, data) {
   return addition;
 }
 
+const find_existing_reviewer = (db, client, data) =>
+  db.collection('reviewers').findOne({ auth_id: data });
+
 function add_new_reviewer(db, client, data) {
   const addition = db
     .collection('reviewers')
@@ -124,7 +123,48 @@ function add_new_reviewer(db, client, data) {
   return addition;
 };
 
+app.post('/add-reviewer', async (req, res) => {
+  const { auth_id, name, avatar } = req.body;
+  console.log(req.body);
+  const avatarToSave = avatar || 'http://voice4thought.org/wp-content/uploads/2016/08/default1.jpg';
+  const newUser = {
+    auth_id,
+    name,
+    avatar: avatarToSave,
+    registered: new Date(),
+    reviews: [],
+  };
+  try {
+    let db;
+    let super_client;
+    await MongoClient.connect(mongo_url).then((client) => {
+      db = client.db('bears13');
+      super_client = client;
+    });
+    const user = await add_new_reviewer(db, super_client, newUser);
+    // fn above this line doesn't actually return the new user. `user` is undef
+    return res.send(newUser);
+  } catch (err) {
+    return res.send({ message: `Error adding profile: ${err}` });
+  }
+});
 
+app.get('/profile', async (req, res) => {
+  try {
+    let db;
+    let super_client;
+    await MongoClient.connect(mongo_url).then((client) => {
+      db = client.db('bears13');
+      super_client = client;
+    });
+    const user = await find_existing_reviewer(db, super_client, req.query.sub);
+    return res.send({ user });
+  } catch (err) {
+    return res.send({ message: `Error getting profile: ${err}` });
+  }
+});
+
+/*
 const add_starter_data_to_db = async () => {
   const sample_location = {
     id: 1,
@@ -164,3 +204,4 @@ const add_starter_data_to_db = async () => {
 add_starter_data_to_db().then(() => {
   console.log('Starter data added.');
 });
+*/
