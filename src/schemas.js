@@ -6,18 +6,28 @@ export const UserSchema = new Schema({
   name: String,
   reviews: [Number],
   avatar: String,
-  registered: Date
+  registered: Date,
+  id: Number
 });
 
 export const LocationSchema = new Schema({
   name: String,
   geo: Object,
-  avatar: String
+  avatar: String,
+  reviews: [Number],
+  id: Number
 });
 
 export const ReviewSchema = new Schema({
   user_id: Number,
   location_id: Number,
   text: String,
-  score: Number
+  score: Number,
+  id: Number,
+  posted: Date
+});
+
+export const GeoSchema = new Schema({
+  type: String,
+  coordinates: [Number]
 });

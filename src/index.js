@@ -104,8 +104,20 @@ function add_new_location(db, client, data) {
   return addition;
 }
 
-const find_existing_reviewer = (db, client, data) =>
-  db.collection('reviewers').findOne({ auth_id: data });
+const find_existing_reviewer = (db, client, data) => {
+  db.collection('reviewers').findOne({ auth_id: data })
+  .then(
+    (result) => {
+      return result;
+    },
+    (err) => {
+      return console.log("Could not find existing reviewer");
+    });
+};
+
+//I hadn't tested this one but findOne returns a Promise that I don't
+//think would work without this little then resolver to return the
+//value of what you found.
 
 function add_new_reviewer(db, client, data) {
   const addition = db
@@ -143,6 +155,8 @@ app.post('/add-reviewer', async (req, res) => {
     });
     const user = await add_new_reviewer(db, super_client, newUser);
     // fn above this line doesn't actually return the new user. `user` is undef
+    //add_new_reviewer only returns a promise, but you could probably
+    //do a .then((result)=> user = result) type of deal to return user that way
     return res.send(newUser);
   } catch (err) {
     return res.send({ message: `Error adding profile: ${err}` });
