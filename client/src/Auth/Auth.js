@@ -2,7 +2,6 @@
 import auth0 from 'auth0-js';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
-// import qs from 'querystring';
 
 import history from '../history';
 import AUTH_CONFIG from './auth0-variables';
@@ -41,7 +40,7 @@ export default class Auth {
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);
     const { sub } = jwtDecode(authResult.idToken);
-    const graphQLGetUserQuery = `{user(auth_id: "${sub}") { _id name reviews avatar registered } }`;
+    const graphQLGetUserQuery = `{user(auth_id: "${sub}") { _id username reviews avatar registered } }`;
     axios
       .get('/graphql', { params: { query: graphQLGetUserQuery } })
       .then((response) => {
@@ -62,7 +61,7 @@ export default class Auth {
 
   setMongoSession = (userData) => {
     localStorage.setItem('avatar', userData.avatar);
-    localStorage.setItem('username', userData.name);
+    localStorage.setItem('username', userData.username);
     localStorage.setItem('registered', userData.registered);
     localStorage.setItem('reviews', userData.reviews);
   };

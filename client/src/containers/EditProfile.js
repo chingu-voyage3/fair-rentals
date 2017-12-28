@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
-import qs from 'querystring';
 
 import {
   BigDiv,
@@ -11,6 +10,8 @@ import {
   CredentialForm,
   CredentialFormInput,
 } from '../utils/shared-styles';
+
+axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 class EditProfile extends React.Component {
   state = {
@@ -28,10 +29,10 @@ class EditProfile extends React.Component {
       }, 2000);
     }
     const auth_id = jwtDecode(localStorage.getItem('id_token')).sub;
-    const graphQLAddReviewer = `mutation {add_reviewer(name: "${name}", avatar: "${avatar}", auth_id: "${auth_id}") { name, avatar, registered, reviews } }`;
-    axios.post('/graphql', qs.stringify(graphQLAddReviewer)).then((response) => {
-      console.log(response.data.data);
-      this.props.auth.setMongoSession(response.data.data);
+    const graphQLAddUser = `mutation {add_user(username: "${name}", avatar: "${avatar}", auth_id: "${auth_id}") { username, avatar, registered, reviews, _id } }`;
+    axios.post('/graphql', { query: graphQLAddUser }).then((response) => {
+      console.log(response);
+      this.props.auth.setMongoSession(response.data.data.add_user);
       this.props.history.push('/');
     });
   };
