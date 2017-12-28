@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
@@ -7,7 +8,7 @@ export const UserSchema = new Schema({
   reviews: [Number],
   avatar: String,
   registered: Date,
-  id: Number
+  auth_id: String,
 });
 
 export const LocationSchema = new Schema({
@@ -15,7 +16,7 @@ export const LocationSchema = new Schema({
   geo: Schema.Types.Mixed,
   avatar: String,
   reviews: [Number],
-  id: Number
+  id: Number,
 });
 
 export const ReviewSchema = new Schema({
@@ -24,10 +25,10 @@ export const ReviewSchema = new Schema({
   text: String,
   score: Number,
   id: Number,
-  posted: Date
+  posted: Date,
 });
 
 export const GeoSchema = new Schema({
   type: String,
-  coordinates: [Number]
+  coordinates: [Number],
 });

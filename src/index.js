@@ -1,14 +1,12 @@
-/* eslint-disable camelcase, no-console, no-sequences */
-
 import express from 'express';
 import path from 'path';
-import MongoClient from 'mongodb';
-import graphql from 'graphql';
+// import graphql from 'graphql';
 import graphqlHTTP from 'express-graphql';
 import mongoose from 'mongoose';
-mongoose.Promise = global.Promise;
 
-import {schema} from './types';
+import { schema } from './types';
+
+mongoose.Promise = global.Promise;
 
 require('dotenv').config(); // makes a variable in .env file available at `process.env.VARIABLE`
 
@@ -24,10 +22,13 @@ app.use(express.urlencoded({ extended: true }));
 */
 app.use(express.static(path.join(__dirname, '../client/build')));
 
-app.use('/graphql', graphqlHTTP({
-  schema: schema,
-  graphiql: true,
-}));
+app.use(
+  '/graphql',
+  graphqlHTTP({
+    schema,
+    graphiql: true,
+  }),
+);
 
 /**
  * START SERVER

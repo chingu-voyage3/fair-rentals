@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
+import qs from 'querystring';
 
 import {
   BigDiv,
@@ -27,9 +28,10 @@ class EditProfile extends React.Component {
       }, 2000);
     }
     const auth_id = jwtDecode(localStorage.getItem('id_token')).sub;
-    axios.post('/add-reviewer', { auth_id, name, avatar }).then((response) => {
-      console.log(response);
-      this.props.auth.setMongoSession(response.data);
+    const graphQLAddReviewer = `mutation {add_reviewer(name: "${name}", avatar: "${avatar}", auth_id: "${auth_id}") { name, avatar, registered, reviews } }`;
+    axios.post('/graphql', qs.stringify(graphQLAddReviewer)).then((response) => {
+      console.log(response.data.data);
+      this.props.auth.setMongoSession(response.data.data);
       this.props.history.push('/');
     });
   };

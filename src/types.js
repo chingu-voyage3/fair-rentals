@@ -1,19 +1,21 @@
+
+/* eslint-disable camelcase, no-console */
+
 import createType from 'mongoose-schema-to-graphql';
 import mongoose from 'mongoose';
-const graphql = require("graphql");
-require('dotenv').config();
-const mongo_url = process.env.MONGO_URL;
 
-import {ReviewSchema} from './schemas';
-import {UserSchema} from './schemas';
-import {LocationSchema} from './schemas';
-import {GeoSchema} from './schemas';
+import { ReviewSchema, UserSchema, LocationSchema, GeoSchema } from './schemas';
+
+const graphql = require('graphql');
+require('dotenv').config();
+
+const mongo_url = process.env.MONGO_URL;
 
 const review_config = {
   name: 'reviewType',
   description: 'Review schema',
   class: 'GraphQLObjectType',
-  schema: ReviewSchema
+  schema: ReviewSchema,
 };
 
 const user_config = {
@@ -33,8 +35,8 @@ const location_config = {
 const geo_config = {
   name: 'geoType',
   description: 'geo-location schema',
-  class: 'GraphQLInputObjectType', //Note the Input, very important
-  schema: GeoSchema
+  class: 'GraphQLInputObjectType', // Note the Input, very important
+  schema: GeoSchema,
 };
 
 /*
@@ -61,44 +63,42 @@ const REVIEW = mongoose.model('reviews', ReviewSchema);
 The fieldASTS are used by mongoose to determine which parts of the model need
 to be sent, and are provided by the client in the request (names, ids, etc.)
 */
-function getProjection (fieldASTs) {
+function getProjection(fieldASTs) {
   return fieldASTs.fieldNodes[0].selectionSet.selections.reduce((projections, selection) => {
     projections[selection.name.value] = true;
     return projections;
   }, {});
-};
-
+}
 
 const queryUserField = {
-  type: userType, //What type of data to send
-  args: { //The arguments the client can send as part of the request
-    id: { //so for now, they can only search by id
-      name: 'id',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLInt) //non-null makes it required
-    }
+  type: userType,
+  args: {
+    auth_id: { // switched to auth_id, a unique string coming back from Auth0 service
+      name: 'auth_id',
+      type: new graphql.GraphQLNonNull(graphql.GraphQLString), // now a string, not Int
+    },
   },
-  resolve: async function(_, {id}, source, fieldASTs) { //This is the function that is called
-    let found_user;                                     //when a request is received.
-    var projections = getProjection(fieldASTs);
-    let finder = async function (id) {
+  async resolve(_, { auth_id }, source, fieldASTs) {
+    let found_user;
+    const projections = getProjection(fieldASTs);
+    const finder = async function (string) {
       try {
         await mongoose.connect(mongo_url, {
-          useMongoClient: true
+          useMongoClient: true,
         });
         await USER.findOne({
-          'id': id
+          auth_id: string,
         }, projections)
-        .then((result) => { //This might not be necessary in mongoose, but if we need to change
-          found_user = result;//the data it is helpful
-        });
-      }
-      catch (err) { //also, I don't really understand try/catch haha
+          .then((result) => { // This might not be necessary in mongoose, but if we need to change
+            found_user = result;// the data it is helpful
+          });
+      } catch (err) { // also, I don't really understand try/catch haha
         console.log(err);
       }
     };
-    await finder(id);
+    await finder(auth_id); // send auth_id in, instead of previous 'id'
     return found_user;
-  }
+  },
 };
 
 const queryLocationField = {
@@ -106,36 +106,35 @@ const queryLocationField = {
   args: {
     id: {
       name: 'id',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
-    }
+      type: new graphql.GraphQLNonNull(graphql.GraphQLInt),
+    },
   },
-  resolve: async function(_, {id}, source, fieldASTs) {
+  async resolve(_, { id }, source, fieldASTs) {
     let found_location;
-    var projections = getProjection(fieldASTs);
-    let finder = async function (id) {
+    const projections = getProjection(fieldASTs);
+    const finder = async function (id) {
       try {
         await mongoose.connect(mongo_url, {
-          useMongoClient: true
+          useMongoClient: true,
         });
         await LOCATION.findOne({
-          'id': id
+          id,
         }, projections)
-        .then((result) => {
-          found_location = result;
-        });
-      }
-      catch (err) {
+          .then((result) => {
+            found_location = result;
+          });
+      } catch (err) {
         console.log(err);
       }
     };
     await finder(id)
-    .then(()=>{
-      if (found_location.geo) {
-        found_location.geo = JSON.stringify(found_location.geo);
-      }
-    });
+      .then(() => {
+        if (found_location.geo) {
+          found_location.geo = JSON.stringify(found_location.geo);
+        }
+      });
     return found_location;
-  }
+  },
 };
 
 const queryReviewField = {
@@ -143,32 +142,32 @@ const queryReviewField = {
   args: {
     id: {
       name: 'id',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
-    }
+      type: new graphql.GraphQLNonNull(graphql.GraphQLInt),
+    },
   },
-  resolve: async function(_, {id}, source, fieldASTs) {
+  async resolve(_, { id }, source, fieldASTs) {
     let found_review;
-    var projections = getProjection(fieldASTs);
-    let finder = async function (id) {
+    const projections = getProjection(fieldASTs);
+    const finder = async function (id) {
       try {
         await mongoose.connect(mongo_url, {
-          useMongoClient: true
+          useMongoClient: true,
         });
         await REVIEW.findOne({
-          'id': id
+          id,
         }, projections)
-        .then((result) => {
-          found_review = result;
-        });
-      }
-      catch (err) {
+          .then((result) => {
+            found_review = result;
+          });
+      } catch (err) {
         console.log(err);
       }
     };
     await finder(id);
     return found_review;
-  }
+  },
 };
+
 
 /*
 This variable is used in the schema, which as far as I can tell
@@ -179,7 +178,7 @@ const query = new graphql.GraphQLObjectType({
   fields: {
     user: queryUserField,
     location: queryLocationField,
-    review: queryReviewField
+    review: queryReviewField,
     /*
     so for now we can query using user, location, and review
     like so:
@@ -191,42 +190,42 @@ const query = new graphql.GraphQLObjectType({
 
     And now it's time for some mutation fields
     */
-  }
+  },
 });
 
 const addUserField = {
   type: userType,
   args: {
-    id: {
-      name: 'id',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
+    auth_id: {
+      name: 'auth_id',
+      type: new graphql.GraphQLNonNull(graphql.GraphQLString),
     },
     username: {
       name: 'user name',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+      type: new graphql.GraphQLNonNull(graphql.GraphQLString),
     },
     avatar: {
       name: 'avatar url',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLString)
-    }
+      type: new graphql.GraphQLNonNull(graphql.GraphQLString),
+    },
   },
-  resolve: async function(_, {id, username, avatar}) {
+  async resolve(_, { auth_id, username, avatar }) {
     await mongoose.connect(mongo_url, {
-      useMongoClient: true
+      useMongoClient: true,
     });
-    let new_user = new USER({
-      id: id,
-      username: username,
-      avatar: avatar,
+    const new_user = new USER({
+      auth_id,
+      username,
+      avatar,
       reviews: [],
-      registered: Date()
+      registered: Date(),
     });
     return new_user.save((err) => {
       if (err) {
         return console.log('Unable to add new reviewer ', err);
       }
     });
-  }
+  },
 };
 
 const addLocationField = {
@@ -234,38 +233,40 @@ const addLocationField = {
   args: {
     id: {
       name: 'id',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
+      type: new graphql.GraphQLNonNull(graphql.GraphQLInt),
     },
     name: {
       name: 'location name',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+      type: new graphql.GraphQLNonNull(graphql.GraphQLString),
     },
     avatar: {
       name: 'avatar url',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+      type: new graphql.GraphQLNonNull(graphql.GraphQLString),
     },
     geo: {
       name: 'Geo coordinates',
-      type: new graphql.GraphQLNonNull(geoType), //note the custom input type
-    }
+      type: new graphql.GraphQLNonNull(geoType), // note the custom input type
+    },
   },
-  resolve: async function(_, {id, name, avatar, geo}) {
+  async resolve(_, {
+    id, name, avatar, geo,
+  }) {
     await mongoose.connect(mongo_url, {
-      useMongoClient: true
+      useMongoClient: true,
     });
-    let new_location = new LOCATION({
-      id: id,
-      name: name,
-      avatar: avatar,
+    const new_location = new LOCATION({
+      id,
+      name,
+      avatar,
       geo: JSON.stringify(geo),
-      reviews: []
+      reviews: [],
     });
     return new_location.save((err, doc) => {
       if (err) {
         return console.log('Unable to add new location', err);
       }
     });
-  }
+  },
 };
 
 const addReviewField = {
@@ -273,66 +274,72 @@ const addReviewField = {
   args: {
     id: {
       name: 'id',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
+      type: new graphql.GraphQLNonNull(graphql.GraphQLInt),
     },
     location_id: {
       name: 'location ID',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
+      type: new graphql.GraphQLNonNull(graphql.GraphQLInt),
     },
     user_id: {
       name: 'user ID',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
+      type: new graphql.GraphQLNonNull(graphql.GraphQLInt),
     },
     text: {
       name: 'review text contents',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+      type: new graphql.GraphQLNonNull(graphql.GraphQLString),
     },
     score: {
       name: 'review score',
-      type: new graphql.GraphQLNonNull(graphql.GraphQLInt)
-    }
+      type: new graphql.GraphQLNonNull(graphql.GraphQLInt),
+    },
   },
-  resolve: async function(_, {id, location_id, user_id, text, score}) {
+  async resolve(_, {
+    id, location_id, user_id, text, score,
+  }) {
     try {
       await mongoose.connect(mongo_url, {
-        useMongoClient: true
+        useMongoClient: true,
       });
 
-      await USER.findOneAndUpdate({
-        'id': user_id
-      },
-      {
-        $push: {
-          "reviews": id
-        }
-      },
-      (err) => {
-        if (err) {
-          return console.log('Could not update location reviews', err);
-        }
-      });
+      await USER.findOneAndUpdate(
+        {
+          id: user_id,
+        },
+        {
+          $push: {
+            reviews: id,
+          },
+        },
+        (err) => {
+          if (err) {
+            return console.log('Could not update location reviews', err);
+          }
+        },
+      );
 
-      await LOCATION.findOneAndUpdate({
-        'id': location_id
-      },
-      {
-        $push: {
-          "reviews": id
-        }
-      },
-      (err) => {
-        if (err) {
-          return console.log('Could not update location reviews', err);
-        }
-      });
+      await LOCATION.findOneAndUpdate(
+        {
+          id: location_id,
+        },
+        {
+          $push: {
+            reviews: id,
+          },
+        },
+        (err) => {
+          if (err) {
+            return console.log('Could not update location reviews', err);
+          }
+        },
+      );
 
-      let new_review = new REVIEW({
-        'id': id,
-        'user_id': user_id,
-        'location_id': location_id,
-        'score': score,
-        'text': text,
-        'posted': Date()
+      const new_review = new REVIEW({
+        id,
+        user_id,
+        location_id,
+        score,
+        text,
+        posted: Date(),
       });
 
       return new_review.save((err) => {
@@ -340,12 +347,10 @@ const addReviewField = {
           return console.log('Could not add new review', err);
         }
       });
-    }
-    catch (err) {
+    } catch (err) {
       return console.log(err);
     }
-
-  }
+  },
 };
 
 const mutation = new graphql.GraphQLObjectType({
@@ -353,7 +358,7 @@ const mutation = new graphql.GraphQLObjectType({
   fields: {
     add_user: addUserField,
     add_location: addLocationField,
-    add_review: addReviewField
+    add_review: addReviewField,
     /*
     These are just as easy, but with more required fields
     mutation {
@@ -366,7 +371,7 @@ const mutation = new graphql.GraphQLObjectType({
       }
     }
     */
-  }
+  },
 });
 
-export const schema = new graphql.GraphQLSchema({query: query, mutation: mutation});
+export const schema = new graphql.GraphQLSchema({ query, mutation });
