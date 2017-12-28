@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
 export const UserSchema = new Schema({
-  name: String,
+  username: String,
   reviews: [Number],
   avatar: String,
   registered: Date,
@@ -12,7 +12,7 @@ export const UserSchema = new Schema({
 
 export const LocationSchema = new Schema({
   name: String,
-  geo: Object,
+  geo: Schema.Types.Mixed,
   avatar: String,
   reviews: [Number],
   id: Number
