@@ -5,7 +5,8 @@ const ObjectId = Schema.ObjectId;
 
 export const UserSchema = new Schema({
   username: String,
-  reviews: [Number],
+  review_ids: [Number],
+  review_contents: [String],
   avatar: String,
   registered: Date,
   auth_id: String,

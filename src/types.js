@@ -80,7 +80,16 @@ const queryUserField = {
   },
   async resolve(_, { auth_id }, source, fieldASTs) {
     let found_user;
+    let dont_return_ids = false;
     const projections = getProjection(fieldASTs);
+
+    if (projections.review_contents) {
+      if (!(projections.review_ids)) {
+        dont_return_ids = true;
+        projections.review_ids = true;
+      }
+    }
+
     const finder = async function (string) {
       try {
         await mongoose.connect(mongo_url, {
@@ -96,7 +105,31 @@ const queryUserField = {
         console.log(err);
       }
     };
+
     await finder(auth_id); // send auth_id in, instead of previous 'id'
+
+    if (projections.review_contents && found_user !== null) {
+      let review_contents = [];
+      await REVIEW.find(
+        {
+          "id":
+          {
+            $in: found_user.review_ids
+          }
+        }, 'text id', //projections can just be strings
+      )
+      .then((docs) => {
+        for (let doc in docs) {
+          review_contents.push(`${docs[doc].id}: ${docs[doc].text}`);
+        }
+        console.log(review_contents);
+        found_user.review_contents = review_contents;
+        if (dont_return_ids) {
+          delete found_user.review_ids;
+        }
+      });
+    }
+
     return found_user;
   },
 };
@@ -217,7 +250,7 @@ const addUserField = {
       auth_id,
       username,
       avatar,
-      reviews: [],
+      review_ids: [],
       registered: Date(),
     });
     return new_user.save((err) => {
