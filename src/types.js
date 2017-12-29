@@ -49,16 +49,33 @@ const user_config = {
             {
               $in: review_ids
             }
-          }, 'text id', //projections can just be strings
+          }, 'text id posted', //projections can just be strings
         )
         .then((docs) => {
-          //TODO order by posted Date
-          //Return only the latest x reviews
+          let reviews = [];
           for (let doc in docs) {
-            review_contents.push(`${docs[doc].id}: ${docs[doc].text}`);
+            reviews.push(docs[doc]);
+          }
+
+          reviews.sort((a,b) => {
+            return Date.parse(reviews[b].posted) - Date.parse(reviews[a].posted);
+          });
+
+          if (latest !== undefined) {
+            for (let i = 0; i < latest; i++) {
+              if (reviews[i] !== undefined) {
+                review_contents.push(`${reviews[i].id}: ${reviews[i].text}`);
+              }
+            }
+          }
+          else {
+            for (let doc in docs) {
+              review_contents.push(`${docs[doc].id}: ${docs[doc].text}`);
+            }
           }
         });
-        return review_contents;
+
+        return review_contents; //needs to be an array of strings
       },
     },
   },
