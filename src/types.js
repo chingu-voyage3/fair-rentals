@@ -23,6 +23,45 @@ const user_config = {
   description: 'User schema',
   class: 'GraphQLObjectType',
   schema: UserSchema,
+  extend: { //extend adds additional fields to the type
+    review_contents: { //so review_contents can  also accept arguments
+      type: graphql.GraphQLList(graphql.GraphQLString),
+      args: {
+        latest: {
+          name: "Latest",
+          description: "Number of reviews to return, sorted by most recently posted.",
+          type: graphql.GraphQLInt,
+        }
+      },
+      async resolve (_, { latest }, source, fieldASTs) {
+        let review_ids = [];
+        let review_contents = [];
+        for (let item in _._doc.review_ids) {
+          item = _._doc.review_ids[item];
+          item = parseInt(item);
+          if (!isNaN(item)) {
+            review_ids.push(item);
+          }
+        }
+        await REVIEW.find(
+          {
+            "id":
+            {
+              $in: review_ids
+            }
+          }, 'text id', //projections can just be strings
+        )
+        .then((docs) => {
+          //TODO order by posted Date
+          //Return only the latest x reviews
+          for (let doc in docs) {
+            review_contents.push(`${docs[doc].id}: ${docs[doc].text}`);
+          }
+        });
+        return review_contents;
+      },
+    },
+  },
 };
 
 const location_config = {
@@ -107,28 +146,6 @@ const queryUserField = {
     };
 
     await finder(auth_id); // send auth_id in, instead of previous 'id'
-
-    if (projections.review_contents && found_user !== null) {
-      let review_contents = [];
-      await REVIEW.find(
-        {
-          "id":
-          {
-            $in: found_user.review_ids
-          }
-        }, 'text id', //projections can just be strings
-      )
-      .then((docs) => {
-        for (let doc in docs) {
-          review_contents.push(`${docs[doc].id}: ${docs[doc].text}`);
-        }
-        console.log(review_contents);
-        found_user.review_contents = review_contents;
-        if (dont_return_ids) {
-          delete found_user.review_ids;
-        }
-      });
-    }
 
     return found_user;
   },
