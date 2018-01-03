@@ -1,0 +1,32 @@
+.review-wrap {
+  border-radius: 4px;
+  padding: 0.25rem 1rem;
+  margin: 0.5rem;
+  background: #eee;
+  border: 1px solid #999;
+  font-family: 'Slabo 27px', Helvetica, sans-serif;
+  animation-name: up;
+  animation-timing-function: ease-in;
+  animation-duration: 0.25s;
+  animation-fill-mode: forwards;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.top-line {
+  font-style: italic;
+}
+
+.review-text {
+  font-size: 1rem;
+}
+
+@keyframes up {
+  0% {
+    transform: translatey(30px);
+  }
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}
