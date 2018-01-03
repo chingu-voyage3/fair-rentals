@@ -1,4 +1,6 @@
+/* eslint-disable class-methods-use-this, no-alert, no-console, jsx-a11y/href-no-hash */
 import React from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 
@@ -29,9 +31,8 @@ class EditProfile extends React.Component {
       }, 2000);
     }
     const auth_id = jwtDecode(localStorage.getItem('id_token')).sub;
-    const graphQLAddUser = `mutation {add_user(username: "${name}", avatar: "${avatar}", auth_id: "${auth_id}") { username, avatar, registered, reviews, _id } }`;
-    axios.post('/graphql', { query: graphQLAddUser }).then((response) => {
-      console.log(response);
+    const graphQLAddUser = `mutation {add_user(username: "${name}", avatar: "${avatar}", auth_id: "${auth_id}") { username, avatar, registered, review_ids, _id } }`;
+    return axios.post('/graphql', { query: graphQLAddUser }).then((response) => {
       this.props.auth.setMongoSession(response.data.data.add_user);
       this.props.history.push('/');
     });
@@ -47,7 +48,7 @@ class EditProfile extends React.Component {
         <MedText>Welcome!</MedText>
         <p />
         <CredentialForm onSubmit={this.submit}>
-          <Label htmlFor="name">We don't have a name for you yet.</Label>
+          <Label htmlFor="name">We have no name for you, yet.</Label>
           <CredentialFormInput
             type="text"
             name="name"
@@ -56,9 +57,7 @@ class EditProfile extends React.Component {
             placeholder="name"
           />
           <p />
-          <Label htmlFor="avatar">
-            If you'd like an avatar, add a link to an image file. (optional)
-          </Label>
+          <Label htmlFor="avatar">Add a link to an image/avatar file. (optional)</Label>
           <CredentialFormInput
             type="avatar"
             name="avatar"
@@ -73,5 +72,10 @@ class EditProfile extends React.Component {
     );
   }
 }
+
+EditProfile.propTypes = {
+  auth: PropTypes.object.isRequired, // eslint-disable-line
+  history: PropTypes.object.isRequired, // eslint-disable-line
+};
 
 export default EditProfile;
