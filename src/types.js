@@ -1,4 +1,3 @@
-
 /* eslint-disable camelcase, no-console */
 
 import createType from 'mongoose-schema-to-graphql';
@@ -23,19 +22,21 @@ const user_config = {
   description: 'User schema',
   class: 'GraphQLObjectType',
   schema: UserSchema,
-  extend: { //extend adds additional fields to the type
-    review_contents: { //so review_contents can  also accept arguments
+  extend: {
+    // extend adds additional fields to the type
+    review_contents: {
+      // so review_contents can  also accept arguments
       type: graphql.GraphQLList(graphql.GraphQLString),
       args: {
         latest: {
-          name: "Latest",
-          description: "Number of reviews to return, sorted by most recently posted.",
+          name: 'Latest',
+          description: 'Number of reviews to return, sorted by most recently posted.',
           type: graphql.GraphQLInt,
-        }
+        },
       },
-      async resolve (_, { latest }, source, fieldASTs) {
-        let review_ids = [];
-        let review_contents = [];
+      async resolve(_, { latest }, source, fieldASTs) {
+        const review_ids = [];
+        const review_contents = [];
         for (let item in _._doc.review_ids) {
           item = _._doc.review_ids[item];
           item = parseInt(item);
@@ -45,21 +46,18 @@ const user_config = {
         }
         await REVIEW.find(
           {
-            "id":
-            {
-              $in: review_ids
-            }
-          }, 'text id posted', //projections can just be strings
-        )
-        .then((docs) => {
-          let reviews = [];
-          for (let doc in docs) {
+            id: {
+              $in: review_ids,
+            },
+          },
+          'text id posted', // projections can just be strings
+        ).then((docs) => {
+          const reviews = [];
+          for (const doc in docs) {
             reviews.push(docs[doc]);
           }
 
-          reviews.sort((a,b) => {
-            return Date.parse(reviews[b].posted) - Date.parse(reviews[a].posted);
-          });
+          reviews.sort((a, b) => Date.parse(reviews[b].posted) - Date.parse(reviews[a].posted));
 
           if (latest !== undefined) {
             for (let i = 0; i < latest; i++) {
@@ -67,15 +65,14 @@ const user_config = {
                 review_contents.push(`${reviews[i].id}: ${reviews[i].text}`);
               }
             }
-          }
-          else {
-            for (let doc in docs) {
+          } else {
+            for (const doc in docs) {
               review_contents.push(`${docs[doc].id}: ${docs[doc].text}`);
             }
           }
         });
 
-        return review_contents; //needs to be an array of strings
+        return review_contents; // needs to be an array of strings
       },
     },
   },
@@ -129,7 +126,8 @@ function getProjection(fieldASTs) {
 const queryUserField = {
   type: userType,
   args: {
-    auth_id: { // switched to auth_id, a unique string coming back from Auth0 service
+    auth_id: {
+      // switched to auth_id, a unique string coming back from Auth0 service
       name: 'auth_id',
       type: new graphql.GraphQLNonNull(graphql.GraphQLString), // now a string, not Int
     },
@@ -140,7 +138,7 @@ const queryUserField = {
     const projections = getProjection(fieldASTs);
 
     if (projections.review_contents) {
-      if (!(projections.review_ids)) {
+      if (!projections.review_ids) {
         dont_return_ids = true;
         projections.review_ids = true;
       }
@@ -151,13 +149,17 @@ const queryUserField = {
         await mongoose.connect(mongo_url, {
           useMongoClient: true,
         });
-        await USER.findOne({
-          auth_id: string,
-        }, projections)
-          .then((result) => { // This might not be necessary in mongoose, but if we need to change
-            found_user = result;// the data it is helpful
-          });
-      } catch (err) { // also, I don't really understand try/catch haha
+        await USER.findOne(
+          {
+            auth_id: string,
+          },
+          projections,
+        ).then((result) => {
+          // This might not be necessary in mongoose, but if we need to change
+          found_user = result; // the data it is helpful
+        });
+      } catch (err) {
+        // also, I don't really understand try/catch haha
         console.log(err);
       }
     };
@@ -184,22 +186,23 @@ const queryLocationField = {
         await mongoose.connect(mongo_url, {
           useMongoClient: true,
         });
-        await LOCATION.findOne({
-          id,
-        }, projections)
-          .then((result) => {
-            found_location = result;
-          });
+        await LOCATION.findOne(
+          {
+            id,
+          },
+          projections,
+        ).then((result) => {
+          found_location = result;
+        });
       } catch (err) {
         console.log(err);
       }
     };
-    await finder(id)
-      .then(() => {
-        if (found_location.geo) {
-          found_location.geo = JSON.stringify(found_location.geo);
-        }
-      });
+    await finder(id).then(() => {
+      if (found_location.geo) {
+        found_location.geo = JSON.stringify(found_location.geo);
+      }
+    });
     return found_location;
   },
 };
@@ -220,12 +223,14 @@ const queryReviewField = {
         await mongoose.connect(mongo_url, {
           useMongoClient: true,
         });
-        await REVIEW.findOne({
-          id,
-        }, projections)
-          .then((result) => {
-            found_review = result;
-          });
+        await REVIEW.findOne(
+          {
+            id,
+          },
+          projections,
+        ).then((result) => {
+          found_review = result;
+        });
       } catch (err) {
         console.log(err);
       }
@@ -234,7 +239,6 @@ const queryReviewField = {
     return found_review;
   },
 };
-
 
 /*
 This variable is used in the schema, which as far as I can tell

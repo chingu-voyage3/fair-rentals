@@ -1,4 +1,4 @@
-/* eslint-disable class-methods-use-this, no-alert, no-console */
+/* eslint-disable class-methods-use-this, no-alert, no-console, jsx-a11y/href-no-hash */
 import auth0 from 'auth0-js';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
@@ -40,7 +40,7 @@ export default class Auth {
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);
     const { sub } = jwtDecode(authResult.idToken);
-    const graphQLGetUserQuery = `{user(auth_id: "${sub}") { _id username reviews avatar registered } }`;
+    const graphQLGetUserQuery = `{user(auth_id: "${sub}") { _id username review_ids avatar registered } }`;
     axios
       .get('/graphql', { params: { query: graphQLGetUserQuery } })
       .then((response) => {
@@ -63,7 +63,7 @@ export default class Auth {
     localStorage.setItem('avatar', userData.avatar);
     localStorage.setItem('username', userData.username);
     localStorage.setItem('registered', userData.registered);
-    localStorage.setItem('reviews', userData.reviews);
+    localStorage.setItem('review_ids', userData.review_ids);
   };
 
   logout = () => {
@@ -72,7 +72,7 @@ export default class Auth {
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
     localStorage.removeItem('avatar');
-    localStorage.removeItem('reviews');
+    localStorage.removeItem('review_ids');
     localStorage.removeItem('username');
     localStorage.removeItem('registered');
     // navigate to the home route
