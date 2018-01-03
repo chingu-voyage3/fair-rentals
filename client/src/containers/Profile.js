@@ -40,7 +40,7 @@ class Profile extends React.Component {
     const registered = localStorage.getItem('registered');
     const review_ids = localStorage.getItem('review_ids');
     this.setState({ username, avatar, registered }, () => {
-      if (review_ids && review_ids.length > 0) {
+      if (review_ids && review_ids.length > 0) { // TODO: replace with GraphQL retrieval
         axios.get('/get-reviews', { params: { review_ids } }).then((response) => {
           this.setState({ reviews: response.data.reviews });
         });

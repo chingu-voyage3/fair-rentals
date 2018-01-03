@@ -16,5 +16,9 @@
   "global_env": "MONGO_URL=[secure] PORT=[secure]",
   "group": "stable",
   "dist": "trusty",
-  "os": "linux"
+  "os": "linux",
+  "notifications": {
+    on_success: never,
+    on_failure: always
+  }
 }

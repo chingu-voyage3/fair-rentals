@@ -1,4 +1,4 @@
-/* eslint-disable class-methods-use-this, no-alert, no-console */
+/* eslint-disable class-methods-use-this, no-alert, no-console, jsx-a11y/href-no-hash */
 import auth0 from 'auth0-js';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
@@ -40,15 +40,20 @@ export default class Auth {
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);
     const { sub } = jwtDecode(authResult.idToken);
+    const graphQLGetUserQuery = `{user(auth_id: "${sub}") { _id username review_ids avatar registered } }`;
     axios
-      .get('/profile', { params: { sub } })
+      .get('/graphql', { params: { query: graphQLGetUserQuery } })
       .then((response) => {
-        this.setMongoSession(response.data.user);
+        if (response.data.data.user) {
+          this.setMongoSession(response.data.data.user);
+        } else {
+          // not found in existing DB, must be new sign up
+          // send to /edit instead:
+          history.replace('/edit-profile');
+        }
       })
       .catch(() => {
-        // not found in existing DB, must be new sign up
-        // send to /edit instead:
-        history.replace('/edit-profile');
+        history.replace('/');
       });
     // navigate to the home route
     history.replace('/');
@@ -56,9 +61,9 @@ export default class Auth {
 
   setMongoSession = (userData) => {
     localStorage.setItem('avatar', userData.avatar);
-    localStorage.setItem('username', userData.name);
+    localStorage.setItem('username', userData.username);
     localStorage.setItem('registered', userData.registered);
-    localStorage.setItem('review_ids', userData.reviews);
+    localStorage.setItem('review_ids', userData.review_ids);
   };
 
   logout = () => {
