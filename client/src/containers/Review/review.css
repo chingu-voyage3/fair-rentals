@@ -20,6 +20,11 @@
 .review-text {
   font-size: 1rem;
 }
+.posted-text {
+  font-size: 0.8rem;
+  text-align: right;
+  color: grey;
+}
 
 @keyframes up {
   0% {

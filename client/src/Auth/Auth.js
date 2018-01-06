@@ -40,30 +40,30 @@ export default class Auth {
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);
     const { sub } = jwtDecode(authResult.idToken);
-    const graphQLGetUserQuery = `{user(auth_id: "${sub}") { _id username review_ids avatar registered } }`;
+    const graphQLGetUserQuery = `{authUser(auth_id: "${sub}") { username avatar registered } }`;
     axios
       .get('/graphql', { params: { query: graphQLGetUserQuery } })
       .then((response) => {
-        if (response.data.data.user) {
-          this.setMongoSession(response.data.data.user);
+        if (response.data.data.authUser) {
+          this.setMongoSession(response.data.data.authUser);
         } else {
           // not found in existing DB, must be new sign up
           // send to /edit instead:
           history.replace('/edit-profile');
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log('error in auth setSession ', error);
         history.replace('/');
       });
     // navigate to the home route
     history.replace('/');
   };
 
-  setMongoSession = (userData) => {
-    localStorage.setItem('avatar', userData.avatar);
-    localStorage.setItem('username', userData.username);
-    localStorage.setItem('registered', userData.registered);
-    localStorage.setItem('review_ids', userData.review_ids);
+  setMongoSession = (createUser) => {
+    localStorage.setItem('avatar', createUser.avatar);
+    localStorage.setItem('username', createUser.username);
+    localStorage.setItem('registered', createUser.registered);
   };
 
   logout = () => {
@@ -71,8 +71,8 @@ export default class Auth {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
+    // ...and also our user stuff
     localStorage.removeItem('avatar');
-    localStorage.removeItem('review_ids');
     localStorage.removeItem('username');
     localStorage.removeItem('registered');
     // navigate to the home route

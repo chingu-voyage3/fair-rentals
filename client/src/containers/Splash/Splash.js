@@ -10,7 +10,7 @@ const Splash = () => (
     <BigText id="mobile-title">Fair Rents</BigText>
     <MedText id="mobile-sub">Rent reviews for and by renters</MedText>
     <NavLink id="big-link" to="/search">
-      Search for a property now
+      Search for a rental location now
     </NavLink>
   </BigDiv>
 );

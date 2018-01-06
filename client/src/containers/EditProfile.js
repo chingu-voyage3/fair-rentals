@@ -31,9 +31,21 @@ class EditProfile extends React.Component {
       }, 2000);
     }
     const auth_id = jwtDecode(localStorage.getItem('id_token')).sub;
-    const graphQLAddUser = `mutation {add_user(username: "${name}", avatar: "${avatar}", auth_id: "${auth_id}") { username, avatar, registered, review_ids, _id } }`;
+    const graphQLAddUser = `
+    mutation {
+      createUser(
+        username: "${name}",
+        avatar: "${avatar}",
+        auth_id: "${auth_id}"
+      ) {
+          username,
+          avatar,
+          registered
+        }
+      }
+    `;
     return axios.post('/graphql', { query: graphQLAddUser }).then((response) => {
-      this.props.auth.setMongoSession(response.data.data.add_user);
+      this.props.auth.setMongoSession(response.data.data.createUser);
       this.props.history.push('/');
     });
   };

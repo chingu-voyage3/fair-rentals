@@ -27,6 +27,18 @@ export const BigDiv = styled.div`
   background-image: linear-gradient(180deg, #efefef 10%, #efefef 70%, steelblue);
 `;
 
+export const Left = styled.div`
+  max-height: 200px;
+  align-self: flex-start;
+  padding: 4em 0em 0em 1em;
+`;
+
+export const RevWrap = styled.div`
+  padding: 1rem;
+  margin: 1rem;
+  width: 50%;
+`;
+
 export const Avatar = styled.img`
   height: 4rem;
   width: 4rem;

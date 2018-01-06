@@ -40,7 +40,7 @@ class Tester extends React.Component {
       user: null,
       text: '',
       location_id: '',
-      score: '',
+      stars: '',
       message: '',
     };
     this.handleChange = this.handleChange.bind(this);
@@ -50,12 +50,12 @@ class Tester extends React.Component {
   componentDidMount() {}
 
   addReview() {
-    const { text, location_id, score } = this.state;
+    const { text, location_id, stars } = this.state;
     const { _id } = this.state.user;
     const reviewToPost = {
       text,
       location_id,
-      score,
+      stars,
       _id,
     };
     // TODO: validate inputs appropriately
@@ -68,7 +68,7 @@ class Tester extends React.Component {
             loading: false,
             text: '',
             location_id: '',
-            score: '',
+            stars: '',
             message: 'Success!',
           });
           setTimeout(() => {
@@ -90,7 +90,7 @@ class Tester extends React.Component {
   }
   render() {
     const {
-      loading, message, text, score,
+      loading, message, text, stars,
     } = this.state;
     if (loading) return <Loading />;
     if (message) {
@@ -113,8 +113,8 @@ class Tester extends React.Component {
             placeholder=" review text"
           />
 
-          <Label htmlFor="score">Your score (0-5):</Label>
-          <Score type="text" name="score" value={score} onChange={this.handleChange} />
+          <Label htmlFor="stars">Your stars (0-5):</Label>
+          <Score type="text" name="stars" value={stars} onChange={this.handleChange} />
 
           <Button type="submit">Submit Review</Button>
         </ReviewForm>
