@@ -56,10 +56,7 @@ const start = async () => {
       type Location {
         _id: String!
         placename: String!
-        reviews: [Review]
-        latest_reviews(num: Int!): [Review]
-        best_to_worst_reviews(num: Int): [Review]
-        worst_to_best_reviews(num: Int): [Review]
+        reviews(latest: Int, sort: String): [Review]
       }
 
       type Review {
@@ -105,25 +102,37 @@ const start = async () => {
         latest_reviews: async ({ _id }, recent) => (await Reviews.find({ user_id: _id }).sort({"posted": -1}).limit(parseInt(recent["num"])).toArray()).map(prepare),
       },
       Location: {
-        reviews: async ({ _id }) =>
-          (await Reviews.find({ location_id: _id }).toArray()).map(prepare),
-        latest_reviews: async ({ _id }, recent) => (await Reviews.find({ location_id: _id }).sort({"posted": -1}).limit(parseInt(recent["num"])).toArray()).map(prepare),
-        best_to_worst_reviews: async ({ _id }, args) =>
-          {
-            if (args["num"]) {
-              return (await Reviews.find({ location_id: _id }).sort({"stars" : -1}).limit(args["num"]).toArray()).map(prepare)
+        reviews: async ({ _id }, args) => {
+
+          if (args["sort"] && args["latest"]) {
+            switch (args["sort"]) {
+              case "best":
+                return (await Reviews.find({ location_id: _id}).sort({"stars": -1, "posted": -1}).limit(args["latest"]).toArray()).map(prepare);
+                break;
+              case "worst":
+                return (await Reviews.find({ location_id: _id}).sort({"stars": 1, "posted": -1}).limit(args["latest"]).toArray()).map(prepare);
+                break;
             }
-            return (await Reviews.find({ location_id: _id }).sort({"stars" : -1}).toArray()).map(prepare)
           }
-        ,
-        worst_to_best_reviews: async ({ _id }, args) =>
-          {
-            if (args["num"]) {
-              return (await Reviews.find({ location_id: _id }).sort({"stars" : 1}).limit(args["num"]).toArray()).map(prepare)
+
+          if (args["sort"]) {
+            switch (args["sort"]) {
+              case "best":
+                return (await Reviews.find({ location_id: _id}).sort({"stars": -1}).toArray()).map(prepare);
+                break;
+              case "worst":
+                return (await Reviews.find({ location_id: _id}).sort({"stars": 1}).toArray()).map(prepare);
+                break;
             }
-            return (await Reviews.find({ location_id: _id }).sort({"stars" : 1}).toArray()).map(prepare)
           }
-        ,
+
+          if (args["latest"]) {
+            return (await Reviews.find({ location_id: _id}).sort({"posted": -1}).limit(args["latest"]).toArray()).map(prepare);
+          }
+
+          return (await Reviews.find({ location_id: _id}).toArray()).map(prepare);
+
+        },
       },
       Review: {
         user: async ({ user_id }) => prepare(await Users.findOne({ _id: ObjectId(user_id) })),
