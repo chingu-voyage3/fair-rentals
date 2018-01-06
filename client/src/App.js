@@ -14,7 +14,7 @@ import Search from './containers/Search/Search';
 import User from './containers/User';
 import Profile from './containers/Profile';
 import EditProfile from './containers/EditProfile';
-import Property from './containers/Property/Property';
+import Location from './containers/Location/Location';
 import FourOhFour from './utils/FourOhFour';
 import AddReview from './containers/AddReview/AddReview';
 
@@ -49,9 +49,8 @@ const App = () => (
         <AuthRoute path="/profile" component={Profile} />
         <AuthRoute path="/edit-profile" component={EditProfile} />
         <Route
-          path="/property/:prop_id"
-          render={props => <Property auth={auth} {...props} />}
-          // render={({ match }) => <Property id={match.params.prop_id} />}
+          path="/location/:location_id"
+          render={props => <Location auth={auth} {...props} />}
         />
         <Route path="/user/:user_id" render={props => <User auth={auth} {...props} />} />
         <Route

@@ -1,12 +1,12 @@
 import React from 'react';
-import Property from '../Property/Property';
+import Location from '../Location/Location';
 import Loading from '../../utils/Loading';
 // import axios from 'axios';
 
 import './searchform.css';
 
 // sample data
-const mockedProperty = {
+const mockedLocation = {
   id: 10000,
   name: 'Southgate North Apartments',
   avatar: 'http://cdn.freshome.com/wp-content/uploads/2007/10/tetris-apartments2.jpg',
@@ -46,9 +46,9 @@ class SearchForm extends React.Component {
   handleSubmit(e) {
     e.preventDefault();
     this.setState({ loading: true, searchValue: this.state.input, input: '' });
-    // mocked search for a property
+    // mocked search for a location
     setTimeout(() => {
-      this.setState({ property: mockedProperty, loading: false });
+      this.setState({ location: mockedLocation, loading: false });
     }, 1000);
   }
 
@@ -58,7 +58,7 @@ class SearchForm extends React.Component {
 
   render() {
     if (this.state.loading) return <Loading />;
-    const { searchValue, property } = this.state;
+    const { searchValue, location } = this.state;
     return (
       <div className="form-wrap">
         <form onSubmit={this.handleSubmit}>
@@ -72,7 +72,7 @@ class SearchForm extends React.Component {
           </label>
           <input type="submit" />
         </form>
-        {searchValue && <Property property={property} />}
+        {searchValue && <Location location={location} />}
       </div>
     );
   }
