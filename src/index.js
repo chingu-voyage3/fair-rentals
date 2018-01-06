@@ -3,7 +3,6 @@
 import { MongoClient, ObjectId } from 'mongodb';
 import express from 'express';
 import path from 'path';
-import assert from 'assert';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
@@ -39,7 +38,9 @@ const start = async () => {
         user(_id: String): User
         authUser(auth_id: String): User
         location(_id: String): Location
+        locationName(placename: String): Location
         review(_id: String): Review
+        getRecents(num: String): [Review]
       }
 
       type User {
@@ -86,7 +87,13 @@ const start = async () => {
         user: async (root, { _id }) => prepare(await Users.findOne(ObjectId(_id))),
         authUser: async (root, { auth_id }) => prepare(await Users.findOne({ auth_id })), // string
         location: async (root, { _id }) => prepare(await Locations.findOne(ObjectId(_id))),
+        locationName: async (root, { placename }) =>
+          prepare(await Locations.findOne({ placename })), // string
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
+        getRecents: async (root, { num }) =>
+          Reviews.find({})
+            .limit(parseInt(num, 10))
+            .toArray(), // no validation on num
       },
       User: {
         reviews: async ({ _id }) => (await Reviews.find({ user_id: _id }).toArray()).map(prepare),

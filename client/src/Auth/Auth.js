@@ -40,7 +40,7 @@ export default class Auth {
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);
     const { sub } = jwtDecode(authResult.idToken);
-    const graphQLGetUserQuery = `{authUser(auth_id: "${sub}") { username avatar registered } }`;
+    const graphQLGetUserQuery = `{authUser(auth_id: "${sub}") { username avatar registered _id } }`;
     axios
       .get('/graphql', { params: { query: graphQLGetUserQuery } })
       .then((response) => {
@@ -64,6 +64,7 @@ export default class Auth {
     localStorage.setItem('avatar', createUser.avatar);
     localStorage.setItem('username', createUser.username);
     localStorage.setItem('registered', createUser.registered);
+    localStorage.setItem('_id', createUser._id);
   };
 
   logout = () => {
@@ -75,6 +76,7 @@ export default class Auth {
     localStorage.removeItem('avatar');
     localStorage.removeItem('username');
     localStorage.removeItem('registered');
+    localStorage.removeItem('_id');
     // navigate to the home route
     history.replace('/');
   };
