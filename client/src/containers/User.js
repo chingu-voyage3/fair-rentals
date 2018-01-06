@@ -53,7 +53,6 @@ class User extends React.Component {
     }`;
 
     axios.post('/graphql', { query: userQuery }).then((response) => {
-      console.log(response.data.data);
       this.setState({ user: response.data.data.user, loading: false });
     });
   }
