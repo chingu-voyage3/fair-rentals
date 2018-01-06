@@ -50,18 +50,22 @@ const start = async () => {
         avatar: String
         registered: Date!
         reviews: [Review]
+        latest_reviews(num: Int): [Review]
       }
 
       type Location {
         _id: String!
         placename: String!
         reviews: [Review]
+        latest_reviews(num: Int!): [Review]
+        best_to_worst_reviews(num: Int): [Review]
+        worst_to_best_reviews(num: Int): [Review]
       }
 
       type Review {
         _id: String!
         text: String!
-        stars: String!
+        stars: Int!
         posted: Date!
         user_id: String!
         location_id: String!
@@ -92,15 +96,34 @@ const start = async () => {
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
         getRecents: async (root, { num }) =>
           Reviews.find({})
+            .sort({"posted": -1})
             .limit(parseInt(num, 10))
             .toArray(), // no validation on num
       },
       User: {
         reviews: async ({ _id }) => (await Reviews.find({ user_id: _id }).toArray()).map(prepare),
+        latest_reviews: async ({ _id }, recent) => (await Reviews.find({ user_id: _id }).sort({"posted": -1}).limit(parseInt(recent["num"])).toArray()).map(prepare),
       },
       Location: {
         reviews: async ({ _id }) =>
           (await Reviews.find({ location_id: _id }).toArray()).map(prepare),
+        latest_reviews: async ({ _id }, recent) => (await Reviews.find({ location_id: _id }).sort({"posted": -1}).limit(parseInt(recent["num"])).toArray()).map(prepare),
+        best_to_worst_reviews: async ({ _id }, args) =>
+          {
+            if (args["num"]) {
+              return (await Reviews.find({ location_id: _id }).sort({"stars" : -1}).limit(args["num"]).toArray()).map(prepare)
+            }
+            return (await Reviews.find({ location_id: _id }).sort({"stars" : -1}).toArray()).map(prepare)
+          }
+        ,
+        worst_to_best_reviews: async ({ _id }, args) =>
+          {
+            if (args["num"]) {
+              return (await Reviews.find({ location_id: _id }).sort({"stars" : 1}).limit(args["num"]).toArray()).map(prepare)
+            }
+            return (await Reviews.find({ location_id: _id }).sort({"stars" : 1}).toArray()).map(prepare)
+          }
+        ,
       },
       Review: {
         user: async ({ user_id }) => prepare(await Users.findOne({ _id: ObjectId(user_id) })),

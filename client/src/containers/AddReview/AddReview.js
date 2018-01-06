@@ -125,7 +125,7 @@ class AddReview extends React.Component {
           user_id:"${user_id}"
           location_id:"${location_id}"
           text:"${text}"
-          stars:"${stars}"
+          stars:"${(starnum)}"
         ) {
           _id
           posted
