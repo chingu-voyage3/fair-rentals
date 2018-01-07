@@ -112,16 +112,25 @@ const start = async () => {
               case "worst":
                 return (await Reviews.find({ location_id: _id}).sort({"stars": 1, "posted": -1}).limit(args["latest"]).toArray()).map(prepare);
                 break;
+              default:
+                console.log("Invalid sort term");
+                break;
             }
           }
 
-          if (args["sort"]) {
+          if (args["sort"] && !args["latest"]) {
             switch (args["sort"]) {
               case "best":
                 return (await Reviews.find({ location_id: _id}).sort({"stars": -1}).toArray()).map(prepare);
                 break;
               case "worst":
                 return (await Reviews.find({ location_id: _id}).sort({"stars": 1}).toArray()).map(prepare);
+                break;
+              case "latest":
+                return (await Reviews.find({ location_id: _id}).sort({"posted": -1}).toArray()).map(prepare);
+                break;
+              default:
+                console.log("Invalid sort term");
                 break;
             }
           }

@@ -22,7 +22,7 @@ class Location extends React.Component {
     query {
       location(_id:"${location_id}") {
         placename
-        reviews {
+        reviews(sort:"latest") {
           user {
             _id
             username
