@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -45,10 +46,19 @@ class Recents extends React.Component {
   };
 
   componentDidMount() {
+    this._mounted = true;
+    this.getRecentItems();
+  }
+
+  componentWillUnmount() {
+    this._mounted = false;
+  }
+
+  getRecentItems = () => {
     const num = 5;
     const getRecentsQuery = `
       query {
-        getRecents(num: "${num}") {
+        getRecents(num: ${num}) {
           text
           stars
           posted
@@ -66,25 +76,41 @@ class Recents extends React.Component {
 
     axios
       .post('/graphql', { query: getRecentsQuery })
-      .then(response => this.setState({ recents: response.data.data.getRecents }))
-      .catch(e => console.log(e));
-  }
+      .then((response) => {
+        if (this._mounted) {
+          this.setState({ recents: response.data.data.getRecents });
+        }
+      })
+      .catch(e =>
+        this.setState({
+          recents: [
+            {
+              text: 'Something went wrong',
+              stars: 0,
+              posted: 1,
+              user: {
+                username: 'The App',
+                _id: 0,
+              },
+              location: {
+                placename: 'The Internet',
+                _id: 1,
+              },
+            },
+          ],
+        }));
+  };
 
   renderRecents = array =>
     array.map((a) => {
+      if (a === null) return null;
       const shortened = a.text.length > 80 ? `${a.text.substring(0, 80)}...` : a.text;
       return (
         <Item key={a.posted}>
           <p>
             <Link to={`/location/${a.location._id}`}>{a.location.placename}</Link>
           </p>
-          <Stars
-            stars={parseInt(a.stars, 10)}
-            outOf={5}
-            full="#134999"
-            empty="#fff"
-            stroke="#000"
-          />
+          <Stars stars={a.stars} outOf={5} full="#134999" empty="#fff" stroke="#000" />
           <p>{shortened}</p>
           <p style={{ justifySelf: 'flex-end' }}>
             ~ <Link to={`/user/${a.user._id}`}>{a.user.username}</Link>,{' '}

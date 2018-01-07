@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console, no-undef, no-param-reassign */
 
 import { MongoClient, ObjectId } from 'mongodb';
 import express from 'express';
@@ -12,7 +12,8 @@ const PORT = process.env.PORT || 3333;
 const { MONGO_URL } = process.env;
 
 const prepare = (o) => {
-  o._id = o._id.toString(); // eslint-disable-line
+  if (!o) return null;
+  o._id = o._id.toString();
   return o;
 };
 
@@ -40,7 +41,7 @@ const start = async () => {
         location(_id: String): Location
         locationName(placename: String): Location
         review(_id: String): Review
-        getRecents(num: String): [Review]
+        getRecents(num: Int): [Review]
       }
 
       type User {
@@ -93,17 +94,20 @@ const start = async () => {
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
         getRecents: async (root, { num }) =>
           Reviews.find({})
-            .sort({"posted": -1})
-            .limit(parseInt(num, 10))
-            .toArray(), // no validation on num
+            .sort({ posted: -1 })
+            .limit(num)
+            .toArray(),
       },
       User: {
         reviews: async ({ _id }) => (await Reviews.find({ user_id: _id }).toArray()).map(prepare),
-        latest_reviews: async ({ _id }, recent) => (await Reviews.find({ user_id: _id }).sort({"posted": -1}).limit(parseInt(recent["num"])).toArray()).map(prepare),
+        latest_reviews: async ({ _id }, recent) =>
+          (await Reviews.find({ user_id: _id })
+            .sort({ posted: -1 })
+            .limit(parseInt(recent.num, 10))
+            .toArray()).map(prepare),
       },
       Location: {
         reviews: async ({ _id }, args) => {
-
           if (args["sort"] && args["latest"]) {
             switch (args["sort"]) {
               case "best":
@@ -135,12 +139,14 @@ const start = async () => {
             }
           }
 
-          if (args["latest"]) {
-            return (await Reviews.find({ location_id: _id}).sort({"posted": -1}).limit(args["latest"]).toArray()).map(prepare);
+          if (args.latest) {
+            return (await Reviews.find({ location_id: _id })
+              .sort({ posted: -1 })
+              .limit(args.latest)
+              .toArray()).map(prepare);
           }
 
-          return (await Reviews.find({ location_id: _id}).toArray()).map(prepare);
-
+          return (await Reviews.find({ location_id: _id }).toArray()).map(prepare);
         },
       },
       Review: {
@@ -165,15 +171,14 @@ const start = async () => {
       // borrowed date handling from https://github.com/graphql/graphql-js/issues/497
       Date: {
         __parseValue(value) {
-          return new Date(value); // value from the client
+          return new Date(value);
         },
         __serialize(value) {
-          return value.getTime(); // value sent to the client
+          return value.getTime();
         },
         __parseLiteral(ast) {
           if (ast.kind === Kind.INT) {
-            // eslint-disable-line
-            return parseInt(ast.value, 10); // ast value is always in string format
+            return parseInt(ast.value, 10);
           }
           return null;
         },

@@ -35,7 +35,7 @@ const PlaceInput = styled.textarea`
 const Score = styled.input`
   font: 1.125rem 'Slabo 27px', Helvetica, sans-serif;
   border: none;
-  width: 1rem;
+  width: 2rem;
   text-align: center;
 `;
 
@@ -110,8 +110,7 @@ class AddReview extends React.Component {
     if (text === '' || stars === '' || placename === '') {
       return this.messager('You need to enter a review and stars');
     }
-    const starnum = parseInt(stars, 10);
-    if (starnum < 0 || starnum > 5 || isNaN(starnum)) {
+    if (stars < 0 || stars > 5 || isNaN(stars)) {
       // TODO: can still enter decimals; they just don't display correctly.
       return this.messager('Stars needs to be an integer from 0 to 5');
     }
@@ -125,7 +124,7 @@ class AddReview extends React.Component {
           user_id:"${user_id}"
           location_id:"${location_id}"
           text:"${text}"
-          stars:"${(starnum)}"
+          stars:"${stars}"
         ) {
           _id
           posted
@@ -140,7 +139,7 @@ class AddReview extends React.Component {
           setTimeout(() => {
             this.setState({ redirect: true });
           }, 1000);
-          return this.setState({ loading: false, message: 'Success!'});
+          return this.setState({ loading: false, message: 'Success!' });
         }
         return this.setState({ loading: false }, () => this.messager('Something fouled up'));
       })
@@ -190,7 +189,14 @@ class AddReview extends React.Component {
           />
 
           <Label htmlFor="stars">Your stars (0-5):</Label>
-          <Score type="text" name="stars" value={stars} onChange={this.handleChange} />
+          <Score
+            type="number"
+            min="0"
+            max="5"
+            name="stars"
+            value={stars}
+            onChange={this.handleChange}
+          />
 
           <Button type="submit">Submit Review</Button>
         </ReviewForm>

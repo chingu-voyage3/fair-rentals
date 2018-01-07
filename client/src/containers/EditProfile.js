@@ -41,6 +41,7 @@ class EditProfile extends React.Component {
           username,
           avatar,
           registered
+          _id
         }
       }
     `;

@@ -24,7 +24,11 @@ export default class Auth {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
-        history.replace('/');
+        /*
+         *  wiping out next line (from Auth0 boilerplate) b/c i want to handle
+         *  the redirect based on setSession()'s result. I'll do it in that fn, not this one
+         */
+        // history.replace('/');
       } else if (err) {
         history.replace('/');
         console.log(err);
@@ -42,22 +46,21 @@ export default class Auth {
     const { sub } = jwtDecode(authResult.idToken);
     const graphQLGetUserQuery = `{authUser(auth_id: "${sub}") { username avatar registered _id } }`;
     axios
-      .get('/graphql', { params: { query: graphQLGetUserQuery } })
+      .post('/graphql', { query: graphQLGetUserQuery })
       .then((response) => {
-        if (response.data.data.authUser) {
+        try {
           this.setMongoSession(response.data.data.authUser);
-        } else {
-          // not found in existing DB, must be new sign up
-          // send to /edit instead:
-          history.replace('/edit-profile');
+        } catch (e) {
+          // not found in mongodb? redirect new user to edit-profile
+          return history.push('/edit-profile');
         }
+        return history.replace('/');
       })
       .catch((error) => {
-        console.log('error in auth setSession ', error);
-        history.replace('/');
+        console.log('likely network error in Auth.js: ', error);
       });
-    // navigate to the home route
-    history.replace('/');
+    // navigate to the home route (this only triggers if catch above is run)
+    return history.replace('/');
   };
 
   setMongoSession = (createUser) => {

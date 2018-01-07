@@ -21,7 +21,7 @@ const Review = ({ rev, index }) => {
       <p className="top-line">
         <Link to={linkTo}>{topLine}</Link>
       </p>
-      <Stars stars={parseInt(rev.stars, 10)} outOf={5} full="#134999" empty="#fff" stroke="#000" />
+      <Stars stars={rev.stars} outOf={5} full="#134999" empty="#fff" stroke="#000" />
       <p className="review-text">{rev.text}</p>
       <p className="posted-text">review posted {new Date(rev.posted).toDateString()}</p>
     </div>
@@ -42,7 +42,7 @@ Review.propTypes = {
       registered: PropTypes.number.isRequired,
     }),
     text: PropTypes.string.isRequired,
-    stars: PropTypes.string.isRequired,
+    stars: PropTypes.number.isRequired,
     posted: PropTypes.number.isRequired,
   }).isRequired,
 };
