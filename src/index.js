@@ -204,6 +204,10 @@ const start = async () => {
 
     app.use(express.static(path.join(__dirname, '../client/build')));
 
+    // next line basically just to get /callback route to react-router on front-end
+    // (static method above doesn't do the trick)
+    app.get('*', (req, res) => res.sendFile('index.html', { root: './client/build' }));
+
     app.listen(PORT, () => console.log(`listening on ${PORT}`));
   } catch (e) {
     console.log(e);
