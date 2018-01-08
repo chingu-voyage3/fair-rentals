@@ -1,48 +1,53 @@
-/* eslint-disable react/forbid-prop-types */
 import React from 'react';
-import PropTypes from 'prop-types';
+import { object } from 'prop-types';
 import styled from 'styled-components';
 
-const AuthBtnWrap = styled.div`
+const LoginWrap = styled.nav`
+  border-top: 1px solid steelblue;
+  border-bottom: 1px solid steelblue;
+  background: #ddd;
   width: 100%;
+  height: 3rem;
   display: flex;
   flex-flow: row nowrap;
   justify-content: flex-end;
   align-items: center;
-  padding: 0em 0.5em 0em 0.5em;
+  @media (max-width: 450px) {
+    justify-content: space-around;
+    font-size: 0.75rem;
+  }
 `;
 
 const AuthBtn = styled.button`
   border: none;
-  margin: 0.25rem;
+  margin-right: 2rem;
   text-decoration: none;
   color: steelblue;
-  font: 1rem 'Barlow Semi Condensed', Helvetica, sans-serif;
+  font: inherit;
   cursor: pointer;
 `;
 
-class Login extends React.Component {
-  login = () => {
-    this.props.auth.login();
-  };
-
-  logout = () => {
-    this.props.auth.logout();
-  };
-
-  render() {
-    const { isAuthenticated } = this.props.auth;
-    return (
-      <AuthBtnWrap>
-        {!isAuthenticated() && <AuthBtn onClick={this.login}>Log In</AuthBtn>}
-        {isAuthenticated() && <AuthBtn onClick={this.logout}>Log Out</AuthBtn>}
-      </AuthBtnWrap>
-    );
+const UserP = styled.p`
+  margin-right: auto;
+  margin-left: 2em;
+  @media (max-width: 450px) {
+    margin: 0.5rem 0 0.5rem 0;
   }
-}
+`;
+
+const Login = ({ auth }) => {
+  const { isAuthenticated, login, logout } = auth;
+  return (
+    <LoginWrap>
+      {isAuthenticated() && <UserP>Welcome, {localStorage.getItem('username')}</UserP>}
+      {!isAuthenticated() && <AuthBtn onClick={login}>Log In</AuthBtn>}
+      {isAuthenticated() && <AuthBtn onClick={logout}>Log Out</AuthBtn>}
+    </LoginWrap>
+  );
+};
 
 Login.propTypes = {
-  auth: PropTypes.object.isRequired,
+  auth: object.isRequired, // eslint-disable-line
 };
 
 export default Login;
