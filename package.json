@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/chingu-voyage3/bears-13#readme",
   "dependencies": {
+    "@google/maps": "^0.4.5",
     "backpack-core": "^0.4.3",
     "concurrently": "^3.5.1",
     "dotenv": "^4.0.0",

@@ -10,6 +10,10 @@ require('dotenv').config();
 
 const PORT = process.env.PORT || 3333;
 const { MONGO_URL } = process.env;
+const googleMapsClient = require('@google/maps').createClient({
+  key: process.env.GOOG_KEY,
+  Promise,
+});
 
 const prepare = (o) => {
   if (!o) return null;
@@ -198,6 +202,59 @@ const start = async () => {
     });
 
     const app = express();
+
+    /*
+    temporary test of google places API
+    */
+    app.use(express.json());
+
+    app.post('/autocomplete', (req, res) => {
+      const {
+        input, radius, latitude, longitude,
+      } = req.body.data;
+      googleMapsClient
+        .placesAutoComplete({
+          types: 'establishment',
+          location: { latitude, longitude },
+          input,
+          radius,
+        })
+        .asPromise()
+        .then((response) => {
+          if (response.status === 200) {
+            return res.send(response);
+          }
+          return res.send({ message: 'Not found.' });
+        });
+    });
+
+    app.post('/find', (req, res) => {
+      console.log(req.body);
+      const {
+        input, latitude, longitude, radius,
+      } = req.body;
+      googleMapsClient
+        .placesNearby({
+          types: 'establishment',
+          radius,
+          name: input,
+          location: {
+            latitude,
+            longitude,
+          },
+        })
+        .asPromise()
+        .then((err, response) => {
+          if (err) return res.send(err);
+          console.log(response);
+          return res.json({ response });
+        })
+        .catch(e => console.log(e));
+    });
+
+    /*
+    end temp test
+    */
 
     app.use('/graphql', express.json(), graphqlExpress({ schema }));
     app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
