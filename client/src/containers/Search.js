@@ -96,7 +96,7 @@ class Search extends React.Component {
         if (res.errors) {
           return console.log(res.errors); // terrible error handling
         }
-        if (!res.data.data.locationGoogle._id) {
+        if (!res.data.data.locationGoogle) {
           return this.create_new_location(place_id, placename);
         }
         return this.props.history.push(`/location/${res.data.data.locationGoogle._id}`);
