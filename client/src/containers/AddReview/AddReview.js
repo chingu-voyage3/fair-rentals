@@ -1,10 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
-import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Loading from '../../utils/Loading';
-import { BigDiv, Button, MedText } from '../../utils/shared-styles';
+import { Button, MedText } from '../../utils/shared-styles';
 
 const ReviewForm = styled.form`
   width: 100%;
@@ -23,14 +23,7 @@ const TextInput = styled.textarea`
   border: none;
   width: 40rem;
   max-width: 90%;
-  height: 15rem;
-`;
-const PlaceInput = styled.textarea`
-  font: 1rem 'Slabo 27px', Helvetica, sans-serif;
-  border: none;
-  width: 40rem;
-  max-width: 90%;
-  height: 2rem;
+  height: 8rem;
 `;
 const Score = styled.input`
   font: 1.125rem 'Slabo 27px', Helvetica, sans-serif;
@@ -46,18 +39,13 @@ class AddReview extends React.Component {
       loading: false,
       text: '',
       stars: '',
-      placename: '',
-      location_id: '',
       // geometry: {
       //   type: 'point',
       //   coordinates: [0, 0],
       // },
       message: '',
-      redirect: false,
     };
   }
-
-  componentDidMount() {}
 
   messager = (message) => {
     setTimeout(() => {
@@ -66,57 +54,23 @@ class AddReview extends React.Component {
     return this.setState({ message, loading: false });
   };
 
-  checkLocation = async (placename) => {
-    const existingLocQuery = `
-      query {
-        locationName(
-          placename:"${placename}"
-        ) {
-          _id
-        }
-      }
-    `;
-    const createLocQuery = `
-      mutation {
-        createLocation(
-          placename: "${placename}"
-        ) {
-          _id
-        }
-      }
-    `;
-    let location_id;
-    try {
-      return await axios
-        .post('/graphql', { query: existingLocQuery })
-        .then(response => response.data.data.locationName._id);
-    } catch (e) {
-      location_id = await axios
-        .post('/graphql', { query: createLocQuery })
-        .then(response => response.data.data.createLocation._id);
-    }
-    return location_id;
-  };
-
   addReview = async () => {
     this.setState({ loading: true });
 
-    const { text, stars, placename } = this.state;
+    const { location_id } = this.props;
+    const { text, stars } = this.state;
     const user_id = localStorage.getItem('_id');
 
     if (!user_id) {
       return this.messager('How did you get here?!');
     }
-    if (text === '' || stars === '' || placename === '') {
+    if (text === '' || stars === '') {
       return this.messager('You need to enter a review and stars');
     }
     if (stars < 0 || stars > 5 || isNaN(stars)) {
       // TODO: can still enter decimals; they just don't display correctly.
       return this.messager('Stars needs to be an integer from 0 to 5');
     }
-
-    const location_id = await this.checkLocation(placename);
-    this.setState({ location_id });
 
     const createReviewQuery = `
       mutation {
@@ -137,7 +91,7 @@ class AddReview extends React.Component {
       .then((response) => {
         if (response.status === 200) {
           setTimeout(() => {
-            this.setState({ redirect: true });
+            this.setState({ message: '' });
           }, 1000);
           return this.setState({ loading: false, message: 'Success!' });
         }
@@ -154,55 +108,41 @@ class AddReview extends React.Component {
 
   render() {
     const {
-      loading, message, text, stars, placename, redirect, location_id,
+      loading, message, text, stars,
     } = this.state;
-    if (loading) {
-      return (
-        <BigDiv>
-          <Loading />
-          {message && <MedText>{message} Redirecting...</MedText>}
-        </BigDiv>
-      );
-    }
-    if (redirect) {
-      return <Redirect to={`/location/${location_id}`} />;
-    }
-    if (message) {
-      return (
-        <BigDiv>
-          <MedText>{message}</MedText>
-        </BigDiv>
-      );
-    }
+
+    if (loading) return <Loading />;
+    if (message) return <MedText>{message}</MedText>;
+
     return (
-      <BigDiv>
-        <ReviewForm onSubmit={this.addReview}>
-          <Label htmlFor="placename">Location name:</Label>
-          <PlaceInput type="text" name="placename" value={placename} onChange={this.handleChange} />
-          <Label htmlFor="text">Your review:</Label>
-          <TextInput
-            type="text"
-            name="text"
-            value={text}
-            onChange={this.handleChange}
-            placeholder=" review text"
-          />
+      <ReviewForm onSubmit={this.addReview}>
+        <Label htmlFor="text">Your review:</Label>
+        <TextInput
+          type="text"
+          name="text"
+          value={text}
+          onChange={this.handleChange}
+          placeholder=" review text"
+        />
 
-          <Label htmlFor="stars">Your stars (0-5):</Label>
-          <Score
-            type="number"
-            min="0"
-            max="5"
-            name="stars"
-            value={stars}
-            onChange={this.handleChange}
-          />
+        <Label htmlFor="stars">Your stars (0-5):</Label>
+        <Score
+          type="number"
+          min="0"
+          max="5"
+          name="stars"
+          value={stars}
+          onChange={this.handleChange}
+        />
 
-          <Button type="submit">Submit Review</Button>
-        </ReviewForm>
-      </BigDiv>
+        <Button type="submit">Submit Review</Button>
+      </ReviewForm>
     );
   }
 }
+
+AddReview.propTypes = {
+  location_id: PropTypes.string.isRequired,
+};
 
 export default AddReview;
