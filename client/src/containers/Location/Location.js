@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
+import AddReview from '../AddReview/AddReview';
 import Review from '../Review/Review';
 import Loading from '../../utils/Loading';
 import { BigDiv, MedText, Left, RevWrap } from '../../utils/shared-styles';
@@ -44,6 +45,8 @@ class Location extends React.Component {
 
   render() {
     const { loading } = this.state;
+    const user_id = localStorage.getItem('_id');
+
     if (loading || !this.state.location) {
       return (
         <BigDiv style={{ paddingTop: '10rem' }}>
@@ -57,6 +60,12 @@ class Location extends React.Component {
         <Left>
           <MedText>{placename}</MedText>
         </Left>
+        {/* if logged in, AddReview component appears */}
+        {user_id ? (
+          <AddReview location_id={this.props.match.params.location_id} />
+        ) : (
+          <p>Log in to add your review of this location...</p>
+        )}
         <RevWrap>{reviews.map((rev, i) => <Review key={rev._id} rev={rev} index={i} />)}</RevWrap>
       </BigDiv>
     );

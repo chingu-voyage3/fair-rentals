@@ -33,7 +33,6 @@ const Header = ({ auth }) => (
       <NavLink exact to="/">
         Home
       </NavLink>
-      {auth.isAuthenticated() && <NavLink to="/add-review">Add Review</NavLink>}
       {auth.isAuthenticated() && <NavLink to="/profile">Edit Profile</NavLink>}
     </Menu>
     <Login auth={auth} />

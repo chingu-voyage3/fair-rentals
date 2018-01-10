@@ -77,6 +77,7 @@ class Recents extends React.Component {
     axios
       .post('/graphql', { query: getRecentsQuery })
       .then((response) => {
+        console.log(response);
         if (this._mounted) {
           this.setState({ recents: response.data.data.getRecents });
         }
