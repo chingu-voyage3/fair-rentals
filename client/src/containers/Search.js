@@ -64,7 +64,55 @@ class Search extends React.Component {
 
     maybe check our Locations collection. If a match... go to its
     page (domain/location/:mongo-id), but with an "Add Review" component at the top?
+    */
+    function check_for_existing (id, name) {
+      const query = `
+      query {
+        location(id:"${id}") {
+            _id
+          }
+        }
+      }`;
 
+      axios
+        .post('/graphql', { query: query })
+        .then((res) => {
+          if (res["errors"]) {
+            return console.log(res["errors"]); //terrible error handling
+          }
+
+          if (!res.data.location) {
+            create_new_location(id, name);
+          }
+          else {
+            this.props.history.push(`"/location/${res.data.location._id}"`)
+          }
+        })
+        .catch((err)=>{ console.log("Error querying for location", err); });
+    };
+
+    function create_new_location(id, name) {
+      const mutation = `
+      mutation {
+        createLocation(id: "${id}", placename: "${name}") {
+          _id
+        }
+      }`;
+
+      axios
+        .post('/graphql', { mutation })
+        .then((res) => {
+          if(res["errors"]) {
+            return console.log(res["errors"]);
+          }
+          this.props.history.push(`"/location/${res.data.createLocation._id}"`)
+        })
+        .catch((err) => { console.log("Error adding new location", err)})
+
+    };
+
+    check_for_existing(place_id, placename);
+    /*
     else create a Location in our mongodb, and still do the same?
 
     N.B.: consider adding a 3rd item, a shorter version of the name. currently
