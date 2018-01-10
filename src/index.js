@@ -42,8 +42,8 @@ const start = async () => {
       type Query {
         user(_id: String): User
         authUser(auth_id: String): User
-        location(id: String): Location
-        locationName(placename: String): Location
+        location(_id: String): Location
+        locationGoogle(place_id: String): Location
         review(_id: String): Review
         getRecents(num: Int): [Review]
       }
@@ -62,7 +62,7 @@ const start = async () => {
         _id: String!
         placename: String!
         reviews(latest: Int, sort: String): [Review]
-        id: String!
+        place_id: String!
       }
 
       type Review {
@@ -78,7 +78,7 @@ const start = async () => {
 
       type Mutation {
         createUser(auth_id: String!, username: String!, avatar: String): User
-        createLocation(placename: String!, id: String!): Location
+        createLocation(placename: String!, place_id: String!): Location
         createReview(user_id: String!, location_id: String!, text: String!, stars: String!): Review
       }
 
@@ -89,15 +89,13 @@ const start = async () => {
     `,
     ];
 
-    //I don't know how to make the ID's be unique
-
     const resolvers = {
       Query: {
         user: async (root, { _id }) => prepare(await Users.findOne(ObjectId(_id))),
-        authUser: async (root, { auth_id }) => prepare(await Users.findOne({ auth_id })), // string
-        location: async (root, { id }) => prepare(await Locations.findOne({"id": id})),
-        locationName: async (root, { placename }) =>
-          prepare(await Locations.findOne({ placename })), // string
+        authUser: async (root, { auth_id }) => prepare(await Users.findOne({ auth_id })),
+        location: async (root, { _id }) => prepare(await Locations.findOne(ObjectId(_id))),
+        locationGoogle: async (root, { place_id }) =>
+          prepare(await Locations.findOne({ place_id })),
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
         getRecents: async (root, { num }) =>
           Reviews.find({})

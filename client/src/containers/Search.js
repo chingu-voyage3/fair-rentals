@@ -59,72 +59,56 @@ class Search extends React.Component {
   };
 
   submitPlace = (place_id, placename) => {
-    console.log(place_id, placename);
-    /* now what? we have a unique place_id and name
+    this.check_for_existing(place_id, placename);
+  };
 
-    maybe check our Locations collection. If a match... go to its
-    page (domain/location/:mongo-id), but with an "Add Review" component at the top?
-    */
-    function check_for_existing (id, name) {
-      const query = `
-      query {
-        location(id:"${id}") {
-            _id
-          }
+  create_new_location = (place_id, placename) => {
+    const mutation = `
+    mutation {
+      createLocation(place_id: "${place_id}", placename: "${placename}") {
+        _id
+      }
+    }`;
+    axios
+      .post('/graphql', { query: mutation })
+      .then((res) => {
+        if (res.errors) {
+          return console.log(res.errors);
         }
-      }`;
+        return this.props.history.push(`/location/${res.data.data.createLocation._id}`);
+      })
+      .catch((err) => {
+        console.log('Error adding new location', err);
+      });
+  };
 
-      axios
-        .post('/graphql', { query: query })
-        .then((res) => {
-          if (res["errors"]) {
-            return console.log(res["errors"]); //terrible error handling
-          }
-
-          if (!res.data.location) {
-            create_new_location(id, name);
-          }
-          else {
-            this.props.history.push(`"/location/${res.data.location._id}"`)
-          }
-        })
-        .catch((err)=>{ console.log("Error querying for location", err); });
-    };
-
-    function create_new_location(id, name) {
-      const mutation = `
-      mutation {
-        createLocation(id: "${id}", placename: "${name}") {
+  check_for_existing = (place_id, placename) => {
+    const query = `
+    query {
+      locationGoogle(place_id:"${place_id}") {
           _id
         }
-      }`;
-
-      axios
-        .post('/graphql', { mutation })
-        .then((res) => {
-          if(res["errors"]) {
-            return console.log(res["errors"]);
-          }
-          this.props.history.push(`"/location/${res.data.createLocation._id}"`)
-        })
-        .catch((err) => { console.log("Error adding new location", err)})
-
-    };
-
-    check_for_existing(place_id, placename);
-    /*
-    else create a Location in our mongodb, and still do the same?
-
-    N.B.: consider adding a 3rd item, a shorter version of the name. currently
-    it uses a version of the place's name that always includes City, STATE.
-    */
+      }
+    `;
+    axios
+      .post('/graphql', { query })
+      .then((res) => {
+        if (res.errors) {
+          return console.log(res.errors); // terrible error handling
+        }
+        if (!res.data.data.locationGoogle._id) {
+          return this.create_new_location(place_id, placename);
+        }
+        return this.props.history.push(`/location/${res.data.data.locationGoogle._id}`);
+      })
+      .catch(err => console.log('Error querying for location', err));
   };
 
   handleClick = (e) => {
     e.preventDefault();
     const place_id = e.target.id;
-    const name = e.target.value;
-    this.submitPlace(place_id, name);
+    const placename = e.target.value;
+    this.submitPlace(place_id, placename);
   };
 
   handleChange = (e) => {
@@ -149,8 +133,9 @@ class Search extends React.Component {
         if (response.status === 200) {
           try {
             const placesObj = response.data.json.predictions.map(p => ({
-              name: p.description,
-              id: p.place_id,
+              longname: p.description,
+              placename: p.structured_formatting.main_text,
+              place_id: p.place_id,
             }));
             return this.setState({ options: placesObj });
           } catch (servererror) {
@@ -172,8 +157,13 @@ class Search extends React.Component {
           {options.length > 0 && (
             <OptionWrap>
               {options.map(a => (
-                <OneOption key={a.id} id={a.id} value={a.name} onClick={this.handleClick}>
-                  {a.name}
+                <OneOption
+                  key={a.place_id}
+                  id={a.place_id}
+                  value={a.placename}
+                  onClick={this.handleClick}
+                >
+                  {a.longname}
                 </OneOption>
               ))}
             </OptionWrap>
@@ -187,6 +177,7 @@ class Search extends React.Component {
 
 Search.propTypes = {
   coords: PropTypes.object, // eslint-disable-line
+  history: PropTypes.object.isRequired, // eslint-disable-line
 };
 
 export default geolocated({
