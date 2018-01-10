@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import styled from 'styled-components';
 
-import { BigText, BigDiv } from '../utils/shared-styles';
+import { BigText, MedText, BigDiv } from '../utils/shared-styles';
 
 const SearchForm = styled.form`
   width: 60%;
@@ -47,8 +47,15 @@ class Search extends React.Component {
     this.state = {
       input: '',
       options: [],
+      message: '',
     };
   }
+  messager = (message) => {
+    setTimeout(() => {
+      this.setState({ message: '' });
+    }, 2000);
+    return this.setState({ message });
+  };
 
   handleFormSubmit = (e) => {
     e.preventDefault();
@@ -56,6 +63,7 @@ class Search extends React.Component {
     // how to handle the form Submit, separate from a click on one of the options?
     // submit whatever's first on the current this.state.options array, maybe?
     // (and if none, return false)
+    // UPDATE: weirdly, this seems to be the default behavior?
   };
 
   submitPlace = (place_id, placename) => {
@@ -73,13 +81,11 @@ class Search extends React.Component {
       .post('/graphql', { query: mutation })
       .then((res) => {
         if (res.errors) {
-          return console.log(res.errors);
+          return this.messager(res.errors);
         }
         return this.props.history.push(`/location/${res.data.data.createLocation._id}`);
       })
-      .catch((err) => {
-        console.log('Error adding new location', err);
-      });
+      .catch(err => this.messager(`Error adding new location: ${err}`));
   };
 
   check_for_existing = (place_id, placename) => {
@@ -93,15 +99,11 @@ class Search extends React.Component {
     axios
       .post('/graphql', { query })
       .then((res) => {
-        if (res.errors) {
-          return console.log(res.errors); // terrible error handling
-        }
-        if (!res.data.data.locationGoogle) {
-          return this.create_new_location(place_id, placename);
-        }
+        if (res.errors) return this.messager(res.errors);
+        if (!res.data.data.locationGoogle) return this.create_new_location(place_id, placename);
         return this.props.history.push(`/location/${res.data.data.locationGoogle._id}`);
       })
-      .catch(err => console.log('Error querying for location', err));
+      .catch(err => this.messager(`Error querying for location: ${err}`));
   };
 
   handleClick = (e) => {
@@ -113,21 +115,19 @@ class Search extends React.Component {
 
   handleChange = (e) => {
     e.preventDefault();
-    this.setState({ [e.target.name]: e.target.value });
-    let latitude = 40;
-    let longitude = -90;
-    // can't figure a better way to deal with delay of coords populating
-    if (this.props.coords) {
-      latitude = this.props.coords.latitude;
-      longitude = this.props.coords.longitude;
-    }
+    const input = e.target.value.toString();
+    this.setState({ [e.target.name]: input });
+    if (input.length < 1) return null;
+    const { latitude, longitude } = this.props.coords
+      ? this.props.coords
+      : { latitude: 30, longitude: -90 };
     const data = {
-      input: e.target.value.toString(),
+      input,
       latitude,
       longitude,
-      radius: 2000000,
+      radius: 20000,
     };
-    axios
+    return axios
       .post('/autocomplete', { data })
       .then((response) => {
         if (response.status === 200) {
@@ -139,19 +139,22 @@ class Search extends React.Component {
             }));
             return this.setState({ options: placesObj });
           } catch (servererror) {
-            return this.setState({ options: [] }); // error message on page, instead?
+            this.setState({ options: [] });
+            return this.messager(`Autocomplete server error: ${servererror}`);
           }
         }
-        return null; // error message here too?
+        // this next line should be unreachable, but just in case...
+        return this.messager('Something went wrong with the autocomplete');
       })
-      .catch(err => console.log(err)); // and here too? 'network error' notice?
+      .catch(err => this.messager(`Autocomplete catch: ${err}`));
   };
 
   render() {
-    const { input, options } = this.state;
+    const { input, options, message } = this.state;
     return (
       <BigDiv>
         <BigText>Search</BigText>
+        <MedText>{message}</MedText>
         <SearchForm onSubmit={this.handleFormSubmit}>
           <SearchInput type="text" name="input" value={input} onChange={this.handleChange} />
           {options.length > 0 && (
