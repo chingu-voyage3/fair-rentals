@@ -10,7 +10,7 @@ import './App.css';
 
 import Splash from './containers/Splash/Splash';
 import Header from './containers/Header';
-import Search from './containers/Search/Search';
+import Search from './containers/Search';
 import User from './containers/User';
 import Profile from './containers/Profile';
 import EditProfile from './containers/EditProfile';

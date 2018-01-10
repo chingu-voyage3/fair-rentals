@@ -10,6 +10,10 @@ require('dotenv').config();
 
 const PORT = process.env.PORT || 3333;
 const { MONGO_URL } = process.env;
+const googleMapsClient = require('@google/maps').createClient({
+  key: process.env.GOOG_KEY,
+  Promise,
+});
 
 const prepare = (o) => {
   if (!o) return null;
@@ -39,7 +43,7 @@ const start = async () => {
         user(_id: String): User
         authUser(auth_id: String): User
         location(_id: String): Location
-        locationName(placename: String): Location
+        locationGoogle(place_id: String): Location
         review(_id: String): Review
         getRecents(num: Int): [Review]
       }
@@ -58,6 +62,7 @@ const start = async () => {
         _id: String!
         placename: String!
         reviews(latest: Int, sort: String): [Review]
+        place_id: String!
       }
 
       type Review {
@@ -73,7 +78,7 @@ const start = async () => {
 
       type Mutation {
         createUser(auth_id: String!, username: String!, avatar: String): User
-        createLocation(placename: String!): Location
+        createLocation(placename: String!, place_id: String!): Location
         createReview(user_id: String!, location_id: String!, text: String!, stars: String!): Review
       }
 
@@ -87,10 +92,10 @@ const start = async () => {
     const resolvers = {
       Query: {
         user: async (root, { _id }) => prepare(await Users.findOne(ObjectId(_id))),
-        authUser: async (root, { auth_id }) => prepare(await Users.findOne({ auth_id })), // string
+        authUser: async (root, { auth_id }) => prepare(await Users.findOne({ auth_id })),
         location: async (root, { _id }) => prepare(await Locations.findOne(ObjectId(_id))),
-        locationName: async (root, { placename }) =>
-          prepare(await Locations.findOne({ placename })), // string
+        locationGoogle: async (root, { place_id }) =>
+          prepare(await Locations.findOne({ place_id })),
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
         getRecents: async (root, { num }) =>
           Reviews.find({})
@@ -198,6 +203,34 @@ const start = async () => {
     });
 
     const app = express();
+
+    /*
+    * google places API
+    */
+    app.use(express.json());
+
+    app.post('/autocomplete', (req, res) => {
+      const {
+        input, radius, latitude, longitude,
+      } = req.body.data;
+      googleMapsClient
+        .placesAutoComplete({
+          types: 'establishment',
+          location: { latitude, longitude },
+          input,
+          radius,
+        })
+        .asPromise()
+        .then((response) => {
+          if (response.status === 200) {
+            return res.send(response);
+          }
+          return res.send({ message: 'Not found.' });
+        });
+    });
+    /*
+    * end google API
+    */
 
     app.use('/graphql', express.json(), graphqlExpress({ schema }));
     app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
