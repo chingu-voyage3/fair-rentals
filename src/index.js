@@ -74,12 +74,21 @@ const start = async () => {
         location_id: String!
         user: User!
         location: Location!
+        last_edited: Date!
+      }
+
+      input EditReviewInput {
+        review_id: String!
+        stars: Int!
+        text: String!
       }
 
       type Mutation {
         createUser(auth_id: String!, username: String!, avatar: String): User
         createLocation(placename: String!, place_id: String!): Location
         createReview(user_id: String!, location_id: String!, text: String!, stars: String!): Review
+        editReview(input: EditReviewInput!): Review
+        deleteReview(review_id: String!): Review
       }
 
       schema {
@@ -88,6 +97,8 @@ const start = async () => {
       }
     `,
     ];
+    //Apparently doing input: {} is better for the front end because you only have to send one object?
+    //https://dev-blog.apollodata.com/designing-graphql-mutations-e09de826ed97
 
     const resolvers = {
       Query: {
@@ -179,6 +190,38 @@ const start = async () => {
           const res = await Reviews.insert({ ...args, posted: new Date() });
           return prepare(await Reviews.findOne({ _id: res.insertedIds[0] }));
         },
+        editReview: async (root, args) => {
+          try {
+            const res = await Reviews.findOneAndUpdate(
+              {
+                _id: ObjectId(args.input.review_id)
+              },
+              {
+                $set:  {
+                  text: args.input.text,
+                  stars: args.input.stars,
+                  last_edited: new Date()
+                }
+              },
+              {
+                returnOriginal: false
+              });
+            return res.value;
+          }
+          catch (err) {
+            return console.log(err);
+          }
+        },
+        deleteReview: async (root, args) => {
+          try {
+            const deletedDoc = prepare(await Reviews.findOne({ _id: ObjectId(args.review_id )}));
+            await Reviews.deleteOne({ _id: ObjectId(args.review_id )});
+            return deletedDoc;
+          }
+          catch (err) {
+            return console.log(err);
+          }
+        }
       },
       // borrowed date handling from https://github.com/graphql/graphql-js/issues/497
       Date: {

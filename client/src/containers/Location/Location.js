@@ -15,11 +15,16 @@ class Location extends React.Component {
     this.state = {
       location: {},
       loading: true,
+      existingReview: null,
     };
   }
   componentWillMount() {
+    this.getLocationData();
+  }
+
+  getLocationData = () => {
     const { location_id } = this.props.match.params;
-    const locationQuery = `
+    const query = `
     query {
       location(_id:"${location_id}") {
         placename
@@ -37,24 +42,32 @@ class Location extends React.Component {
       }
     }
     `;
-
-    axios.post('/graphql', { query: locationQuery }).then((response) => {
-      this.setState({ location: response.data.data.location, loading: false });
+    axios.post('/graphql', { query }).then(async (response) => {
+      const { location } = response.status === 200 ? response.data.data : {};
+      const existingReview = await this.findExistingReview(location.reviews);
+      this.setState({ location: response.data.data.location, existingReview, loading: false });
     });
-  }
+  };
+
+  findExistingReview = (reviews) => {
+    const user_id = localStorage.getItem('_id');
+    if (!user_id || !reviews) return null;
+    const userReview = reviews.filter(rev => rev.user._id === user_id)[0];
+    return userReview || null;
+  };
 
   render() {
-    const { loading } = this.state;
+    const { loading, location, existingReview } = this.state;
     const user_id = localStorage.getItem('_id');
 
-    if (loading || !this.state.location) {
+    if (loading || !location) {
       return (
         <BigDiv style={{ paddingTop: '10rem' }}>
           <Loading />
         </BigDiv>
       );
     }
-    const { placename, reviews } = this.state.location;
+    const { placename, reviews } = location;
     return (
       <BigDiv>
         <Left>
@@ -62,7 +75,11 @@ class Location extends React.Component {
         </Left>
         {/* if logged in, AddReview component appears */}
         {user_id ? (
-          <AddReview location_id={this.props.match.params.location_id} />
+          <AddReview
+            update={this.getLocationData}
+            existingReview={existingReview}
+            location_id={this.props.match.params.location_id}
+          />
         ) : (
           <p>Log in to add your review of this location...</p>
         )}
