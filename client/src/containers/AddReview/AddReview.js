@@ -34,16 +34,25 @@ const Score = styled.input`
 `;
 
 class AddReview extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    let initialState;
+    if (props.existingReview) {
+      initialState = {
+        text: props.existingReview.text,
+        stars: props.existingReview.stars,
+        review_id: props.existingReview._id,
+      };
+    } else {
+      initialState = {
+        text: '',
+        stars: '',
+        review_id: '',
+      };
+    }
     this.state = {
+      ...initialState,
       loading: false,
-      text: '',
-      stars: '',
-      // geometry: {
-      //   type: 'point',
-      //   coordinates: [0, 0],
-      // },
       message: '',
     };
   }
@@ -59,7 +68,7 @@ class AddReview extends React.Component {
     this.setState({ loading: true });
 
     const { location_id } = this.props;
-    const { text, stars } = this.state;
+    const { text, stars, review_id } = this.state;
     const user_id = localStorage.getItem('_id');
 
     if (!user_id) {
@@ -69,7 +78,6 @@ class AddReview extends React.Component {
       return this.messager('You need to enter a review and stars');
     }
     if (stars < 0 || stars > 5 || isNaN(stars)) {
-      // TODO: can still enter decimals; they just don't display correctly.
       return this.messager('Stars needs to be an integer from 0 to 5');
     }
 
@@ -87,19 +95,41 @@ class AddReview extends React.Component {
         }
       }
     `;
-    axios
-      .post('/graphql', { query: createReviewQuery })
+    const editReviewQuery = `
+      mutation {
+        editReview(
+          input: {
+            review_id:"${review_id}"
+            text:"${text}"
+            stars:${stars}
+          }
+        ) {
+          _id
+          posted
+        }
+      }
+    `;
+    // if review_id exists, run update; otherwise create new review
+    const query = review_id ? editReviewQuery : createReviewQuery;
+    return axios
+      .post('/graphql', { query })
       .then((response) => {
         if (response.status === 200) {
           setTimeout(() => {
             this.setState({ message: '' });
-          }, 1000);
-          return this.setState({ loading: false, message: 'Success!' });
+          }, 3000);
+          const returnedId = response.data.data.editReview
+            ? response.data.data.editReview._id
+            : response.data.data.createReview._id;
+          return this.setState({
+            loading: false,
+            message: 'Success!',
+            review_id: returnedId,
+          }, () => this.props.update()); // parent update fn after setState
         }
         return this.setState({ loading: false }, () => this.messager('Something fouled up'));
       })
       .catch(e => this.messager(`something went wrong: ${e}`));
-    return location_id;
   };
 
   handleChange = (e) => {
@@ -107,9 +137,41 @@ class AddReview extends React.Component {
     return this.setState({ [e.target.name]: e.target.value });
   };
 
+  handleDelete = (e) => {
+    e.preventDefault();
+    const { _id } = this.props.existingReview;
+    if (!_id) return null;
+    const deleteReview = `
+      mutation {
+        deleteReview(review_id:"${_id}") {
+          _id
+        }
+      }
+    `;
+    return axios
+      .post('/graphql', { query: deleteReview })
+      .then((response) => {
+        if (response.status === 200) {
+          setTimeout(() => {
+            this.setState({ message: '' });
+          }, 3000);
+          return this.setState({
+            loading: false,
+            message: 'Deleted!',
+            text: '',
+            stars: '',
+            review_id: '',
+          }, () => this.props.update()); // parent update fn after setState
+        }
+        return this.setState({ loading: false }, () =>
+          this.messager('Something went wrong while deleting.'));
+      })
+      .catch(err => this.messager(`deleting error: ${err}`));
+  };
+
   render() {
     const {
-      loading, message, text, stars,
+      loading, message, text, stars, review_id,
     } = this.state;
 
     if (loading) return <Loading />;
@@ -137,13 +199,24 @@ class AddReview extends React.Component {
         />
 
         <Button type="submit">Submit Review</Button>
+        {review_id && (
+          <Button type="button" onClick={this.handleDelete}>
+            Delete Review
+          </Button>
+        )}
       </ReviewForm>
     );
   }
 }
 
 AddReview.propTypes = {
+  update: PropTypes.func.isRequired,
   location_id: PropTypes.string.isRequired,
+  existingReview: PropTypes.object, // eslint-disable-line
+};
+
+AddReview.defaultProps = {
+  existingReview: null,
 };
 
 export default AddReview;
