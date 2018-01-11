@@ -93,9 +93,11 @@ class Profile extends React.Component {
     const graphQLEditUser = `
     mutation {
       editUser(
-        username: "${username}",
-        avatar: "${avatar}",
-        _id: "${_id}"
+        input: {
+          username: "${username}",
+          avatar: "${avatar}",
+          _id: "${_id}"
+        }
       ) {
           username,
           avatar,
