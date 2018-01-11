@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 
+import Review from './Review/Review';
 import {
   BigDiv,
   MedText,
@@ -15,7 +16,6 @@ import {
   CredentialForm,
   CredentialFormInput,
 } from '../utils/shared-styles';
-
 import blankAvatar from '../utils/avatar-blank.jpg';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
@@ -28,13 +28,41 @@ class Profile extends React.Component {
       avatar: '',
       registered: '',
       _id: '',
+      reviews: '',
       message: '',
     };
   }
 
   componentWillMount() {
     this.getUserFromStorage();
+    this.getReviews();
   }
+
+  getReviews = () => {
+    const _id = localStorage.getItem('_id');
+    const userQuery = `
+    query {
+      user(_id:"${_id}") {
+        avatar
+        username
+        registered
+        reviews {
+          location {
+            _id
+            placename
+          }
+          _id
+          text
+          stars
+          posted
+        }
+      }
+    }`;
+
+    axios.post('/graphql', { query: userQuery }).then((response) => {
+      this.setState({ reviews: response.data.data.user.reviews });
+    });
+  };
 
   getUserFromStorage = () => {
     const username = localStorage.getItem('username');
@@ -42,6 +70,7 @@ class Profile extends React.Component {
     const registered = parseInt(localStorage.getItem('registered'), 10);
     const _id = localStorage.getItem('_id');
     this.setState({
+      fixedName: username,
       username,
       avatar,
       registered,
@@ -84,14 +113,14 @@ class Profile extends React.Component {
   };
   render() {
     const {
-      username, avatar, registered, _id, message,
+      username, avatar, registered, _id, message, fixedName, reviews,
     } = this.state;
     return (
       <BigDiv>
         <Left>
           <Avatar src={avatar || blankAvatar} alt="user avatar" />
           <MedText>
-            <Link to={`/user/${_id}`}>{username}</Link>
+            <Link to={`/user/${_id}`}>{fixedName}</Link>
           </MedText>
           <p>Member since {new Date(registered).toDateString()}</p>
         </Left>
@@ -100,16 +129,17 @@ class Profile extends React.Component {
             <Label htmlFor="name">Username</Label>
             <CredentialFormInput
               type="text"
-              name="name"
+              name="username"
               value={username}
               onChange={this.handleChange}
-              placeholder="name"
             />
             <p />
 
             <Button type="submit">Submit</Button>
             <p style={{ color: 'indianred' }}>{message}</p>
           </CredentialForm>
+          {reviews.length > 0 &&
+            reviews.map((rev, i) => <Review key={rev._id} rev={rev} index={i} />)}
         </RevWrap>
       </BigDiv>
     );
