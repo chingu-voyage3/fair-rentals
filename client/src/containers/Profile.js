@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 
 import Review from './Review/Review';
@@ -83,21 +82,20 @@ class Profile extends React.Component {
   };
   submit = (e) => {
     e.preventDefault();
-    const { username, avatar } = this.state;
+    const { username, avatar, _id } = this.state;
     if (username === '' || typeof username !== 'string' || username.length > 40) {
       this.setState({ message: "Let's work on that name." });
       return setTimeout(() => {
         this.setState({ message: '' });
       }, 2000);
     }
-    const auth_id = jwtDecode(localStorage.getItem('id_token')).sub;
     // TODO: editUser mutation doesn't exist yet
     const graphQLEditUser = `
     mutation {
       editUser(
         username: "${username}",
         avatar: "${avatar}",
-        auth_id: "${auth_id}"
+        _id: "${_id}"
       ) {
           username,
           avatar,

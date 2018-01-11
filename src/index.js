@@ -83,12 +83,20 @@ const start = async () => {
         text: String!
       }
 
+      input EditUserInput {
+        _id: String!
+        username: String!
+        avatar: String!
+      }
+
       type Mutation {
         createUser(auth_id: String!, username: String!, avatar: String): User
         createLocation(placename: String!, place_id: String!): Location
         createReview(user_id: String!, location_id: String!, text: String!, stars: String!): Review
         editReview(input: EditReviewInput!): Review
         deleteReview(review_id: String!): Review
+        editUser(input: EditUserInput!): User
+        deleteUser(_id: String!): User
       }
 
       schema {
@@ -217,6 +225,37 @@ const start = async () => {
             const deletedDoc = prepare(await Reviews.findOne({ _id: ObjectId(args.review_id )}));
             await Reviews.deleteOne({ _id: ObjectId(args.review_id )});
             return deletedDoc;
+          }
+          catch (err) {
+            return console.log(err);
+          }
+        },
+        editUser: async (root, args) => {
+          try {
+            const res = await Users.findOneAndUpdate(
+              {
+                _id: ObjectId(args.input._id)
+              },
+              {
+                $set: {
+                  avatar: args.input.avatar,
+                  username: args.input.username
+                }
+              },
+              {
+                returnOriginal: false
+              });
+            return res.value;
+          }
+          catch (err) {
+            return console.log(err);
+          }
+        },
+        deleteUser: async (root, args) => {
+          try {
+            const deletedUser = prepare(await Users.findOne({ _id: ObjectId(args._id )}));
+            await Users.deleteOne({ _id: ObjectId(args._id )});
+            return deletedUser;
           }
           catch (err) {
             return console.log(err);
