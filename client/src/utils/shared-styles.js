@@ -52,6 +52,7 @@ export const Button = styled.button`
   margin-top: 2rem;
   font-size: 0.875rem;
   cursor: pointer;
+  min-height: 2em;
 `;
 
 export const Label = styled.label`

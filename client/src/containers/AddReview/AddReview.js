@@ -24,6 +24,7 @@ const TextInput = styled.textarea`
   width: 40rem;
   max-width: 90%;
   height: 8rem;
+  min-height: 2rem;
 `;
 const Score = styled.input`
   font: 1.125rem 'Slabo 27px', Helvetica, sans-serif;
