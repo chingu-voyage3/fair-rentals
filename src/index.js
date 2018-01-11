@@ -79,14 +79,14 @@ const start = async () => {
 
       input EditReviewInput {
         review_id: String!
-        stars: Int!
-        text: String!
+        stars: Int
+        text: String
       }
 
       input EditUserInput {
         _id: String!
-        username: String!
-        avatar: String!
+        username: String
+        avatar: String
       }
 
       type Mutation {
@@ -200,17 +200,24 @@ const start = async () => {
         },
         editReview: async (root, args) => {
           try {
+
+            let update_value = {
+              $set: {}
+            };
+
+            if (args.input.stars) {
+              update_value.$set.stars = args.input.stars
+            }
+
+            if (args.input.text) {
+              update_value.$set.text = args.input.text
+            }
+
             const res = await Reviews.findOneAndUpdate(
               {
                 _id: ObjectId(args.input.review_id)
               },
-              {
-                $set:  {
-                  text: args.input.text,
-                  stars: args.input.stars,
-                  last_edited: new Date()
-                }
-              },
+              update_value,
               {
                 returnOriginal: false
               });
@@ -232,16 +239,23 @@ const start = async () => {
         },
         editUser: async (root, args) => {
           try {
+            let update_value = {
+              $set: {}
+            };
+
+            if (args.input.username) {
+              update_value.$set.username = args.input.username
+            }
+
+            if (args.input.avatar) {
+              update_value.$set.avatar = args.input.avatar
+            }
+
             const res = await Users.findOneAndUpdate(
               {
                 _id: ObjectId(args.input._id)
               },
-              {
-                $set: {
-                  avatar: args.input.avatar,
-                  username: args.input.username
-                }
-              },
+              update_value,
               {
                 returnOriginal: false
               });
