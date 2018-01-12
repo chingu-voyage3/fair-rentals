@@ -9,8 +9,8 @@ import { BigText, MedText, BigDiv } from '../../utils/shared-styles';
 
 const Splash = () => (
   <BigDiv>
-    <BigText id="mobile-title">Fair Rents</BigText>
-    <MedText id="mobile-sub">Rent reviews for and by renters</MedText>
+    <BigText id="mobile-title">Fair Rentals</BigText>
+    <MedText id="mobile-sub">Reviews for rental properties written by renters for renters</MedText>
     <NavLink id="big-link" to="/search">
       Search for a rental location now
     </NavLink>
