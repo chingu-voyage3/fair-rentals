@@ -1,9 +1,9 @@
 require('dotenv').config();
-const callbackPort = process.env.NODE_ENV === 'development' ? '3000' : process.env.PORT;
+const callbackPort = process.env.PORT || 3000;
 
 const AUTH_CONFIG = {
-  domain: 'bear13.auth0.com',
-  clientId: 'fxbqm2dH9hWq2yOi2h65fAKRXsMf6vW1',
+  domain: 'app83259596.auth0.com',
+  clientId: 'NzfwRMKCnd24fhh37tuNDMCzwVrM-GQC',
   callbackUrl: `http://localhost:${callbackPort}/callback`,
 };
 
