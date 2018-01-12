@@ -202,7 +202,9 @@ const start = async () => {
           try {
 
             let update_value = {
-              $set: {}
+              $set: {
+                last_edited: new Date()
+              }
             };
 
             if (args.input.stars) {
