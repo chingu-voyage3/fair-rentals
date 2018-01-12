@@ -118,7 +118,7 @@ const start = async () => {
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
         getRecents: async (root, { num }) =>
           Reviews.find({})
-            .sort({ posted: -1 })
+            .sort({ last_edited: -1 })
             .limit(num)
             .toArray(),
       },
@@ -126,7 +126,7 @@ const start = async () => {
         reviews: async ({ _id }) => (await Reviews.find({ user_id: _id }).toArray()).map(prepare),
         latest_reviews: async ({ _id }, recent) =>
           (await Reviews.find({ user_id: _id })
-            .sort({ posted: -1 })
+            .sort({ last_edited: -1 })
             .limit(parseInt(recent.num, 10))
             .toArray()).map(prepare),
       },
@@ -136,12 +136,12 @@ const start = async () => {
             switch (args.sort) {
               case 'best':
                 return (await Reviews.find({ location_id: _id })
-                  .sort({ stars: -1, posted: -1 })
+                  .sort({ stars: -1, last_edited: -1 })
                   .limit(args.latest)
                   .toArray()).map(prepare);
               case 'worst':
                 return (await Reviews.find({ location_id: _id })
-                  .sort({ stars: 1, posted: -1 })
+                  .sort({ stars: 1, last_edited: -1 })
                   .limit(args.latest)
                   .toArray()).map(prepare);
               default:
@@ -195,7 +195,7 @@ const start = async () => {
           return prepare(await Locations.findOne({ _id: res.insertedIds[0] }));
         },
         createReview: async (root, args) => {
-          const res = await Reviews.insert({ ...args, posted: new Date() });
+          const res = await Reviews.insert({ ...args, posted: new Date(), last_edited: new Date() });
           return prepare(await Reviews.findOne({ _id: res.insertedIds[0] }));
         },
         editReview: async (root, args) => {
