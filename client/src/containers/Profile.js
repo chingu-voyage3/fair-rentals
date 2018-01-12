@@ -29,6 +29,8 @@ class Profile extends React.Component {
       _id: '',
       reviews: '',
       message: '',
+      fixedName: '',
+      fixedAvi: '',
     };
   }
 
@@ -70,6 +72,7 @@ class Profile extends React.Component {
     const _id = localStorage.getItem('_id');
     this.setState({
       fixedName: username,
+      fixedAvi: avatar,
       username,
       avatar,
       registered,
@@ -79,6 +82,22 @@ class Profile extends React.Component {
   handleChange = (e) => {
     e.preventDefault();
     this.setState({ [e.target.name]: e.target.value });
+  };
+  handleDelete = (e) => {
+    e.preventDefault();
+    const _id = e.target.name;
+    if (!_id) return null;
+    const deleteReview = `
+      mutation {
+        deleteReview(review_id:"${_id}") {
+          _id
+        }
+      }
+    `;
+    return axios
+      .post('/graphql', { query: deleteReview })
+      .then(() => this.getReviews())
+      .catch(err => this.messager(`deleting error: ${err}`));
   };
   submit = (e) => {
     e.preventDefault();
@@ -113,12 +132,12 @@ class Profile extends React.Component {
   };
   render() {
     const {
-      username, avatar, registered, _id, message, fixedName, reviews,
+      username, avatar, registered, _id, message, fixedName, fixedAvi, reviews,
     } = this.state;
     return (
       <BigDiv>
         <Left>
-          <Avatar src={avatar || blankAvatar} alt="user avatar" />
+          <Avatar src={fixedAvi || blankAvatar} alt="user avatar" />
           <MedText>
             <Link to={`/user/${_id}`}>{fixedName}</Link>
           </MedText>
@@ -134,12 +153,27 @@ class Profile extends React.Component {
               onChange={this.handleChange}
             />
             <p />
-
+            <Label htmlFor="avatar">Replace your avatar file?</Label>
+            <CredentialFormInput
+              type="avatar"
+              name="avatar"
+              value={avatar}
+              onChange={this.handleChange}
+              placeholder=""
+            />
             <Button type="submit">Submit</Button>
             <p style={{ color: 'indianred' }}>{message}</p>
           </CredentialForm>
           {reviews.length > 0 &&
-            reviews.map((rev, i) => <Review key={rev._id} rev={rev} index={i} />)}
+            reviews.map((rev, i) => (
+              <Review
+                handleDelete={this.handleDelete}
+                the_reviewers_id={_id}
+                key={rev._id}
+                rev={rev}
+                index={i}
+              />
+            ))}
         </RevWrap>
       </BigDiv>
     );

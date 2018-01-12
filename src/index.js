@@ -105,8 +105,6 @@ const start = async () => {
       }
     `,
     ];
-    //Apparently doing input: {} is better for the front end because you only have to send one object?
-    //https://dev-blog.apollodata.com/designing-graphql-mutations-e09de826ed97
 
     const resolvers = {
       Query: {
@@ -200,83 +198,80 @@ const start = async () => {
         },
         editReview: async (root, args) => {
           try {
-
-            let update_value = {
+            const update_value = {
               $set: {
-                last_edited: new Date()
-              }
+                last_edited: new Date(),
+              },
             };
 
             if (args.input.stars) {
-              update_value.$set.stars = args.input.stars
+              update_value.$set.stars = args.input.stars;
             }
 
             if (args.input.text) {
-              update_value.$set.text = args.input.text
+              update_value.$set.text = args.input.text;
             }
 
             const res = await Reviews.findOneAndUpdate(
               {
-                _id: ObjectId(args.input.review_id)
+                _id: ObjectId(args.input.review_id),
               },
               update_value,
               {
-                returnOriginal: false
-              });
+                returnOriginal: false,
+              },
+            );
             return res.value;
-          }
-          catch (err) {
+          } catch (err) {
             return console.log(err);
           }
         },
         deleteReview: async (root, args) => {
           try {
-            const deletedDoc = prepare(await Reviews.findOne({ _id: ObjectId(args.review_id )}));
-            await Reviews.deleteOne({ _id: ObjectId(args.review_id )});
+            const deletedDoc = prepare(await Reviews.findOne({ _id: ObjectId(args.review_id) }));
+            await Reviews.deleteOne({ _id: ObjectId(args.review_id) });
             return deletedDoc;
-          }
-          catch (err) {
+          } catch (err) {
             return console.log(err);
           }
         },
         editUser: async (root, args) => {
           try {
-            let update_value = {
-              $set: {}
+            const update_value = {
+              $set: {},
             };
 
             if (args.input.username) {
-              update_value.$set.username = args.input.username
+              update_value.$set.username = args.input.username;
             }
 
             if (args.input.avatar) {
-              update_value.$set.avatar = args.input.avatar
+              update_value.$set.avatar = args.input.avatar;
             }
 
             const res = await Users.findOneAndUpdate(
               {
-                _id: ObjectId(args.input._id)
+                _id: ObjectId(args.input._id),
               },
               update_value,
               {
-                returnOriginal: false
-              });
+                returnOriginal: false,
+              },
+            );
             return res.value;
-          }
-          catch (err) {
+          } catch (err) {
             return console.log(err);
           }
         },
         deleteUser: async (root, args) => {
           try {
-            const deletedUser = prepare(await Users.findOne({ _id: ObjectId(args._id )}));
-            await Users.deleteOne({ _id: ObjectId(args._id )});
+            const deletedUser = prepare(await Users.findOne({ _id: ObjectId(args._id) }));
+            await Users.deleteOne({ _id: ObjectId(args._id) });
             return deletedUser;
-          }
-          catch (err) {
+          } catch (err) {
             return console.log(err);
           }
-        }
+        },
       },
       // borrowed date handling from https://github.com/graphql/graphql-js/issues/497
       Date: {
