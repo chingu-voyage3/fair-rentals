@@ -1,4 +1,4 @@
-const callbackPort = process.env.NODE_ENV === 'development' ? '3000' : '3333';
+const callbackPort = process.env.NODE_ENV === 'development' ? '3000' : '3466';
 
 const AUTH_CONFIG = {
   domain: 'bear13.auth0.com',
