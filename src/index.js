@@ -8,7 +8,7 @@ import { makeExecutableSchema } from 'graphql-tools';
 
 require('dotenv').config();
 
-const PORT = process.env.PORT || 3466;
+const PORT = process.env.PORT || 3333;
 const { MONGO_URL } = process.env;
 const googleMapsClient = require('@google/maps').createClient({
   key: process.env.GOOG_KEY,
