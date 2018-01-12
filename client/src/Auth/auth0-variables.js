@@ -1,4 +1,5 @@
-const callbackPort = process.env.NODE_ENV === 'development' ? '3000' : '3466';
+require('dotenv').config();
+const callbackPort = process.env.NODE_ENV === 'development' ? '3000' : process.env.PORT;
 
 const AUTH_CONFIG = {
   domain: 'bear13.auth0.com',
