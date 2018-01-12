@@ -279,7 +279,7 @@ const start = async () => {
     app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
     app.use(express.static(path.join(__dirname, '../client/build')));
-
+    //I'm adding a comment so the code will redeploy
     // next line basically just to get /callback route to react-router on front-end
     // (static method above doesn't do the trick)
     app.get('*', (req, res) => res.sendFile('index.html', { root: './client/build' }));
