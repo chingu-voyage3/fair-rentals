@@ -12,10 +12,10 @@
     "eslint-plugin-react": "^7.5.1",
     "expect": "^22.0.0",
     "expect-jsx": "^5.0.0",
-    "react-scripts": "1.0.17",
     "react-test-renderer": "^16.2.0"
   },
   "dependencies": {
+    "react-scripts": "1.0.17",
     "auth0-js": "^8.12.1",
     "axios": "^0.17.1",
     "dotenv": "^4.0.0",
