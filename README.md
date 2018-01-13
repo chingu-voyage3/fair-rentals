@@ -1,10 +1,8 @@
-# bears-13
+# Fair Rentals
 
-work-in-progress notes:
+Fair Rentals is an attempt to bring more fairness to the rental world. Renters can search for any property by address and enter reviews anonymously.
 
-* The server is written in Node, with Express.
-* The front-end was bootstrapped with Create-React-App.
-* The server serves the C-R-A `/build` folder as its root route, while also
-  handling data requests. (at the moment, that's just `/test-route`);
-* To use the mongo test_run on the server, simply open a new instance of mongod; 
-    the dbpath shouldn't matter. 
+
+### Tech Stack
+* The front-end is a Single Page React App bootstrapped using Create-React-App.
+* The back-end is written in Node and Express. It uses a hosted MongoDB instance on mLab as it's database and exposes a GraphQL endpoint.
