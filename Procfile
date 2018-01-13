@@ -1,1 +1,1 @@
-web: cd client && npm install && cd .. && npm start
+web: cd client && npm install && npm run build && cd .. && backpack build && node ./build/main.js
