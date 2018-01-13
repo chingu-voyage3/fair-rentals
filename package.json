@@ -11,8 +11,7 @@
     "server": "backpack",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "npm run build-server && npm run build-client",
-    "start": "npm run build-server && npm run build-client && node ./build/main.js",
-    "heroku-postinstall": "cd client && npm install"
+    "start": "npm run build-server && npm run build-client && node ./build/main.js"
   },
   "repository": {
     "type": "git",
