@@ -11,7 +11,8 @@
     "server": "backpack",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "npm run build-server && npm run build-client",
-    "start": "npm run build-server && node ./build/main.js"
+    "start": "npm run build-server && node ./build/main.js",
+    "postinstall": "cd client && npm install && npm run build"
   },
   "repository": {
     "type": "git",
