@@ -12,7 +12,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "npm run build-server && npm run build-client",
     "start": "npm run build-server && npm run build-client && node ./build/main.js",
-    "heroku-prebuild": "npm install --prefix client --only=dev && npm install --prefix client"
+    "postinstall": "npm install --prefix client"
   },
   "repository": {
     "type": "git",
