@@ -37,9 +37,10 @@ const UserP = styled.p`
 
 const Login = ({ auth }) => {
   const { isAuthenticated, login, logout } = auth;
+  const un = localStorage.getItem('username');
   return (
     <LoginWrap>
-      {isAuthenticated() && <UserP>Welcome, {localStorage.getItem('username')}</UserP>}
+      {isAuthenticated() && un && <UserP>Welcome, {un}</UserP>}
       {!isAuthenticated() && <AuthBtn onClick={login}>Log In</AuthBtn>}
       {isAuthenticated() && <AuthBtn onClick={logout}>Log Out</AuthBtn>}
     </LoginWrap>

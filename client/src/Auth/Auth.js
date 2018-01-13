@@ -1,7 +1,6 @@
 /* eslint-disable class-methods-use-this, no-alert, no-console, jsx-a11y/href-no-hash */
 import auth0 from 'auth0-js';
 import axios from 'axios';
-import jwtDecode from 'jwt-decode';
 
 import history from '../history';
 import AUTH_CONFIG from './auth0-variables';
@@ -13,7 +12,7 @@ export default class Auth {
     redirectUri: AUTH_CONFIG.callbackUrl,
     audience: `https://${AUTH_CONFIG.domain}/userinfo`,
     responseType: 'token id_token',
-    scope: 'openid',
+    scope: 'openid profile',
   });
 
   login = () => {
@@ -24,11 +23,7 @@ export default class Auth {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
-        /*
-         *  wiping out next line (from Auth0 boilerplate) b/c i want to handle
-         *  the redirect based on setSession()'s result. I'll do it in that fn, not this one
-         */
-        // history.replace('/');
+        history.replace('/');
       } else if (err) {
         history.replace('/');
         console.log(err);
@@ -43,24 +38,42 @@ export default class Auth {
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);
-    const { sub } = jwtDecode(authResult.idToken);
-    const graphQLGetUserQuery = `{authUser(auth_id: "${sub}") { username avatar registered _id } }`;
+    const graphQLGetUserQuery = `{authUser(auth_id: "${
+      authResult.idTokenPayload.sub
+    }") { username avatar registered _id } }`;
     axios
       .post('/graphql', { query: graphQLGetUserQuery })
       .then((response) => {
         try {
           this.setMongoSession(response.data.data.authUser);
         } catch (e) {
-          // not found in mongodb? redirect new user to edit-profile
-          return history.push('/edit-profile');
+          this.createNewUser(authResult);
         }
-        return history.replace('/');
       })
       .catch((error) => {
         console.log('likely network error in Auth.js: ', error);
       });
     // navigate to the home route (this only triggers if catch above is run)
     return history.replace('/');
+  };
+  createNewUser = (authResult) => {
+    const graphQLAddUser = `
+    mutation {
+      createUser(
+        username: "${authResult.idTokenPayload.nickname}",
+        avatar: "${authResult.idTokenPayload.picture}",
+        auth_id: "${authResult.idTokenPayload.sub}"
+      ) {
+          username,
+          avatar,
+          registered
+          _id
+        }
+      }
+    `;
+    return axios
+      .post('/graphql', { query: graphQLAddUser })
+      .then(response => this.setMongoSession(response.data.data.createUser));
   };
 
   setMongoSession = (createUser) => {

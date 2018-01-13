@@ -13,7 +13,6 @@ import Header from './containers/Header';
 import Search from './containers/Search';
 import User from './containers/User';
 import Profile from './containers/Profile';
-import EditProfile from './containers/EditProfile';
 import Location from './containers/Location/Location';
 import FourOhFour from './utils/FourOhFour';
 import AddReview from './containers/AddReview/AddReview';
@@ -47,7 +46,6 @@ const App = () => (
         <Route path="/search" component={Search} />
         <AuthRoute path="/add-review" component={AddReview} />
         <AuthRoute path="/profile" component={Profile} />
-        <AuthRoute path="/edit-profile" component={EditProfile} />
         <Route
           path="/location/:location_id"
           render={props => <Location auth={auth} {...props} />}

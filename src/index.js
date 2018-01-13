@@ -79,8 +79,14 @@ const start = async () => {
 
       input EditReviewInput {
         review_id: String!
-        stars: Int!
-        text: String!
+        stars: Int
+        text: String
+      }
+
+      input EditUserInput {
+        _id: String!
+        username: String
+        avatar: String
       }
 
       type Mutation {
@@ -89,6 +95,8 @@ const start = async () => {
         createReview(user_id: String!, location_id: String!, text: String!, stars: String!): Review
         editReview(input: EditReviewInput!): Review
         deleteReview(review_id: String!): Review
+        editUser(input: EditUserInput!): User
+        deleteUser(_id: String!): User
       }
 
       schema {
@@ -97,8 +105,6 @@ const start = async () => {
       }
     `,
     ];
-    //Apparently doing input: {} is better for the front end because you only have to send one object?
-    //https://dev-blog.apollodata.com/designing-graphql-mutations-e09de826ed97
 
     const resolvers = {
       Query: {
@@ -110,7 +116,7 @@ const start = async () => {
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
         getRecents: async (root, { num }) =>
           Reviews.find({})
-            .sort({ posted: -1 })
+            .sort({ last_edited: -1 })
             .limit(num)
             .toArray(),
       },
@@ -118,7 +124,7 @@ const start = async () => {
         reviews: async ({ _id }) => (await Reviews.find({ user_id: _id }).toArray()).map(prepare),
         latest_reviews: async ({ _id }, recent) =>
           (await Reviews.find({ user_id: _id })
-            .sort({ posted: -1 })
+            .sort({ last_edited: -1 })
             .limit(parseInt(recent.num, 10))
             .toArray()).map(prepare),
       },
@@ -128,12 +134,12 @@ const start = async () => {
             switch (args.sort) {
               case 'best':
                 return (await Reviews.find({ location_id: _id })
-                  .sort({ stars: -1, posted: -1 })
+                  .sort({ stars: -1, last_edited: -1 })
                   .limit(args.latest)
                   .toArray()).map(prepare);
               case 'worst':
                 return (await Reviews.find({ location_id: _id })
-                  .sort({ stars: 1, posted: -1 })
+                  .sort({ stars: 1, last_edited: -1 })
                   .limit(args.latest)
                   .toArray()).map(prepare);
               default:
@@ -187,41 +193,85 @@ const start = async () => {
           return prepare(await Locations.findOne({ _id: res.insertedIds[0] }));
         },
         createReview: async (root, args) => {
-          const res = await Reviews.insert({ ...args, posted: new Date() });
+          const res = await Reviews.insert({ ...args, posted: new Date(), last_edited: new Date() });
           return prepare(await Reviews.findOne({ _id: res.insertedIds[0] }));
         },
         editReview: async (root, args) => {
           try {
+            const update_value = {
+              $set: {
+                last_edited: new Date(),
+              },
+            };
+
+            if (args.input.stars) {
+              update_value.$set.stars = args.input.stars;
+            }
+
+            if (args.input.text) {
+              update_value.$set.text = args.input.text;
+            }
+
             const res = await Reviews.findOneAndUpdate(
               {
-                _id: ObjectId(args.input.review_id)
+                _id: ObjectId(args.input.review_id),
               },
+              update_value,
               {
-                $set:  {
-                  text: args.input.text,
-                  stars: args.input.stars,
-                  last_edited: new Date()
-                }
+                returnOriginal: false,
               },
-              {
-                returnOriginal: false
-              });
+            );
             return res.value;
-          }
-          catch (err) {
+          } catch (err) {
             return console.log(err);
           }
         },
         deleteReview: async (root, args) => {
           try {
-            const deletedDoc = prepare(await Reviews.findOne({ _id: ObjectId(args.review_id )}));
-            await Reviews.deleteOne({ _id: ObjectId(args.review_id )});
+            const deletedDoc = prepare(await Reviews.findOne({ _id: ObjectId(args.review_id) }));
+            await Reviews.deleteOne({ _id: ObjectId(args.review_id) });
             return deletedDoc;
-          }
-          catch (err) {
+          } catch (err) {
             return console.log(err);
           }
-        }
+        },
+        editUser: async (root, args) => {
+          try {
+            const update_value = {
+              $set: {},
+            };
+
+            if (args.input.username) {
+              update_value.$set.username = args.input.username;
+            }
+
+            if (args.input.avatar) {
+              update_value.$set.avatar = args.input.avatar;
+            }
+
+            const res = await Users.findOneAndUpdate(
+              {
+                _id: ObjectId(args.input._id),
+              },
+              update_value,
+              {
+                returnOriginal: false,
+              },
+            );
+            return res.value;
+          } catch (err) {
+            return console.log(err);
+          }
+        },
+        deleteUser: async (root, args) => {
+          try {
+            const deletedUser = prepare(await Users.findOne({ _id: ObjectId(args._id) }));
+            await Users.deleteOne({ _id: ObjectId(args._id) });
+            return deletedUser;
+          } catch (err) {
+            return console.log(err);
+          }
+        },
       },
       // borrowed date handling from https://github.com/graphql/graphql-js/issues/497
       Date: {
