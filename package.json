@@ -1,7 +1,7 @@
 {
-  "name": "@shoesandsocks/bears-13",
+  "name": "fair-rentals",
   "version": "1.0.0",
-  "description": "A work in progress, coming soon...",
+  "description": "An anonymous rental reviews site",
   "main": "./src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chingu-voyage3/bears-13.git"
+    "url": "git+https://github.com/chingu-voyage3/fair-rentals.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/chingu-voyage3/bears-13/issues"
+    "url": "https://github.com/chingu-voyage3/fair-rentals/issues"
   },
-  "homepage": "https://github.com/chingu-voyage3/bears-13#readme",
+  "homepage": "https://github.com/chingu-voyage3/fair-rentals#readme",
   "dependencies": {
     "@google/maps": "^0.4.5",
     "backpack-core": "^0.4.3",
