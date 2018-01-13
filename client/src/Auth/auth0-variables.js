@@ -1,3 +1,7 @@
+const callbackUrl =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3000/callback'
+    : 'https://fair-rentals.herokuapp.com/callback';
 
 const callbackUrl =
 process.env.NODE_ENV === 'development'

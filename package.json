@@ -11,9 +11,10 @@
     "server": "backpack",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "npm run build-server && npm run build-client",
-    "start": "npm run build-server && npm run build-client && node ./build/main.js",
-    "heroku-postinstall": "npm install --prefix client --only=dev && npm install --prefix client"
+    "start": "npm run build-server && node ./build/main.js",
+    "postinstall": "cd client && npm install --only=dev && npm install && npm run build"
   },
+  "cacheDirectories": ["client/node_modules"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chingu-voyage3/fair-rentals.git"
