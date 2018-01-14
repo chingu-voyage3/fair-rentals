@@ -41,7 +41,7 @@ export default class Auth {
     const graphQLGetUserQuery = `{authUser(auth_id: "${
       authResult.idTokenPayload.sub
     }") { username avatar registered _id } }`;
-    axios
+    return axios
       .post('/graphql', { query: graphQLGetUserQuery })
       .then((response) => {
         try {
@@ -54,8 +54,6 @@ export default class Auth {
       .catch((error) => {
         console.log('likely network error in Auth.js: ', error);
       });
-    // navigate to the home route (this only triggers if catch above is run)
-    return history.replace('/');
   };
   createNewUser = (authResult) => {
     const graphQLAddUser = `
