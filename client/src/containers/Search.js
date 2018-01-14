@@ -3,6 +3,7 @@ import { geolocated } from 'react-geolocated';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import styled from 'styled-components';
+import { Helmet } from 'react-helmet';
 
 import { BigText, MedText, BigDiv } from '../utils/shared-styles';
 
@@ -153,6 +154,9 @@ class Search extends React.Component {
     const { input, options, message } = this.state;
     return (
       <BigDiv>
+      <Helmet>
+        <title>{`Location Search`}</title>
+      </Helmet>
         <BigText>Search</BigText>
         <MedText>{message}</MedText>
         <SearchForm onSubmit={this.handleFormSubmit}>
