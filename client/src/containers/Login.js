@@ -46,7 +46,7 @@ class Login extends React.Component {
   }
 
   render() {
-    if (!this.state.un) {
+    if (!this.state.un && this.state.auth.isAuthenticated()) {
       setTimeout(this.setUn.bind(this), 500);
     }
     return (
