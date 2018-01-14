@@ -155,7 +155,6 @@ class Location extends React.Component {
     `;
     axios.post('/graphql', { query }).then(async (response) => {
       const { location } = response.status === 200 ? response.data.data : {};
-      const existingReview = await this.findExistingReview(location.reviews);
       if (location.reviews.length > PAGE_LENGTH) {
         let tempReviews = [];
         for (let i = 0; i < PAGE_LENGTH; i++) {
@@ -192,7 +191,6 @@ class Location extends React.Component {
     `;
     axios.post('/graphql', { query }).then(async (response) => {
       const { location } = response.status === 200 ? response.data.data : {};
-      const existingReview = await this.findExistingReview(location.reviews);
       if (location.reviews.length > PAGE_LENGTH) {
         let tempReviews = [];
         for (let i = 0; i < PAGE_LENGTH; i++) {
@@ -229,7 +227,6 @@ class Location extends React.Component {
     `;
     axios.post('/graphql', { query }).then(async (response) => {
       const { location } = response.status === 200 ? response.data.data : {};
-      const existingReview = await this.findExistingReview(location.reviews);
       if (location.reviews.length > PAGE_LENGTH) {
         let tempReviews = [];
         for (let i = 0; i < PAGE_LENGTH; i++) {
@@ -266,7 +263,6 @@ class Location extends React.Component {
     `;
     axios.post('/graphql', { query }).then(async (response) => {
       const { location } = response.status === 200 ? response.data.data : {};
-      const existingReview = await this.findExistingReview(location.reviews);
       if (location.reviews.length > PAGE_LENGTH) {
         let tempReviews = [];
         for (let i = 0; i < PAGE_LENGTH; i++) {
