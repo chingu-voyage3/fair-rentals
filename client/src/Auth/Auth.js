@@ -23,7 +23,6 @@ export default class Auth {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
-        history.go(-2);
       } else if (err) {
         history.replace('/');
         console.log(err);
@@ -47,6 +46,7 @@ export default class Auth {
       .then((response) => {
         try {
           this.setMongoSession(response.data.data.authUser);
+          history.go(-2);
         } catch (e) {
           this.createNewUser(authResult);
         }
