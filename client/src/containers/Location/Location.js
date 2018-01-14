@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import styled from 'styled-components';
 
 import AddReview from '../AddReview/AddReview';
 import Review from '../Review/Review';
@@ -8,6 +9,28 @@ import Loading from '../../utils/Loading';
 import { BigDiv, MedText, Left, RevWrap } from '../../utils/shared-styles';
 
 import './location.css';
+
+const PAGE_LENGTH = 5;
+
+const PrevPageButton = styled.button`
+  text-align: center;
+  display: inline-block;
+  font: 1.125em 'Slabo 27px', Helvetica, sans-serif;
+  color: #334751;
+  background-color: #eee;
+  border-radius: 15px 5px 5px 15px;
+`;
+
+const NextPageButton = styled.button`
+  text-align: center;
+  display: inline-block;
+  font: 1.125em 'Slabo 27px', Helvetica, sans-serif;
+  color: #334751;
+  background-color: #eee;
+  border-radius: 5px 15px 15px 5px;
+  padding-right: 20px;
+`;
+
 
 class Location extends React.Component {
   constructor(props) {
@@ -17,6 +40,9 @@ class Location extends React.Component {
       loading: true,
       existingReview: null,
       message: '',
+      multiplePages: false,
+      reviews: [],
+      reviewCounter: 0,
     };
   }
   componentWillMount() {
@@ -46,8 +72,43 @@ class Location extends React.Component {
     axios.post('/graphql', { query }).then(async (response) => {
       const { location } = response.status === 200 ? response.data.data : {};
       const existingReview = await this.findExistingReview(location.reviews);
-      this.setState({ location: response.data.data.location, existingReview, loading: false });
+      if (location.reviews.length > PAGE_LENGTH) {
+        let tempReviews = [];
+        for (let i = 0; i < PAGE_LENGTH; i++) {
+          tempReviews.push(location.reviews[i]);
+        }
+        this.setState({ location: response.data.data.location, existingReview, loading: false, multiplePages: true, reviews: tempReviews });
+      }
+      else {
+        this.setState({ location: response.data.data.location, existingReview, loading: false, reviews: location.reviews });
+      }
     });
+  };
+
+  PrevPageHandler = () => {
+    if (!this.state.multiplePages || this.state.reviewCounter === 0 ) {
+      return console.log("No other page to navigate to!")
+    }
+    let tempReviews = [];
+    for (let i = (this.state.reviewCounter - PAGE_LENGTH); i < this.state.reviewCounter; i++) {
+      if (this.state.location.reviews[i]) {
+        tempReviews.push(this.state.location.reviews[i]);
+      }
+    }
+    return this.setState({ reviews: tempReviews, reviewCounter: (this.state.reviewCounter - PAGE_LENGTH) });
+  };
+
+  NextPageHandler = () => {
+    if (!this.state.multiplePages || this.state.reviewCounter >= (this.state.location.reviews.length - PAGE_LENGTH) ) {
+      return console.log("No other page to navigate to!")
+    }
+    let tempReviews = [];
+    for (let i = (this.state.reviewCounter + PAGE_LENGTH); i < (this.state.reviewCounter + (PAGE_LENGTH * 2)); i++) {
+      if (this.state.location.reviews[i]) {
+        tempReviews.push(this.state.location.reviews[i]);
+      }
+    }
+    return this.setState({ reviews: tempReviews, reviewCounter: (this.state.reviewCounter + PAGE_LENGTH) });
   };
 
   messager = (message) => {
@@ -146,10 +207,10 @@ class Location extends React.Component {
 
   render() {
     const {
-      loading, location, existingReview, message,
+      loading, location, existingReview, message, reviews,
     } = this.state;
     const user_id = localStorage.getItem('_id');
-    const { placename, reviews } = location;
+    const { placename } = location;
 
     if (message.length) {
       return (
@@ -195,6 +256,11 @@ class Location extends React.Component {
             />
           ))}
         </RevWrap>
+        <span>
+          <PrevPageButton onClick={this.PrevPageHandler}>&#8249; Previous</PrevPageButton>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <NextPageButton onClick={this.NextPageHandler}>Next &#8250;</NextPageButton>
+        </span>
       </BigDiv>
     );
   }
