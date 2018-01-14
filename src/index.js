@@ -160,7 +160,11 @@ const start = async () => {
                   .toArray()).map(prepare);
               case 'latest':
                 return (await Reviews.find({ location_id: _id })
-                  .sort({ posted: -1 })
+                  .sort({ last_edited: -1 })
+                  .toArray()).map(prepare);
+              case 'oldest':
+                return (await Reviews.find({ location_id: _id })
+                  .sort({ posted: 1 })
                   .toArray()).map(prepare);
               default:
                 console.log('Invalid sort term');
@@ -170,7 +174,7 @@ const start = async () => {
 
           if (args.latest) {
             return (await Reviews.find({ location_id: _id })
-              .sort({ posted: -1 })
+              .sort({ last_edited: -1 })
               .limit(args.latest)
               .toArray()).map(prepare);
           }
