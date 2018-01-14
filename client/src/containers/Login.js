@@ -35,16 +35,28 @@ const UserP = styled.p`
   }
 `;
 
-const Login = ({ auth }) => {
-  const { isAuthenticated, login, logout } = auth;
-  const un = localStorage.getItem('username');
-  return (
-    <LoginWrap>
-      {isAuthenticated() && un && <UserP>Welcome, {un}</UserP>}
-      {!isAuthenticated() && <AuthBtn onClick={login}>Log In</AuthBtn>}
-      {isAuthenticated() && <AuthBtn onClick={logout}>Log Out</AuthBtn>}
-    </LoginWrap>
-  );
+class Login extends React.Component {
+  constructor(auth) {
+    super(auth);
+    this.state = {...auth, un:localStorage.getItem('username')};
+  };
+
+  setUn() {
+    return this.setState({ un: localStorage.getItem('username')});
+  }
+
+  render() {
+    if (!this.state.un && this.state.auth.isAuthenticated()) {
+      setTimeout(this.setUn.bind(this), 500);
+    }
+    return (
+      <LoginWrap>
+        {this.state.auth.isAuthenticated() && this.state.un && <UserP>Welcome, {this.state.un}</UserP>}
+        {!this.state.auth.isAuthenticated() && <AuthBtn onClick={this.state.auth.login}>Log In</AuthBtn>}
+        {this.state.auth.isAuthenticated() && <AuthBtn onClick={this.state.auth.logout}>Log Out</AuthBtn>}
+      </LoginWrap>
+    );
+  }
 };
 
 Login.propTypes = {
