@@ -32,6 +32,27 @@ const NextPageButton = styled.button`
   padding-right: 20px;
 `;
 
+const SortDiv = styled.div`
+  display: block;
+  position: relative;
+  width: 200px;
+  right:-120px;
+  top: 20px;
+  width: 50px;
+  height: 100px;
+`;
+
+/*
+  It's actually probably more efficient to just sort the Reviews
+  that were retrieved initially and stored in  state.location.
+
+  TODO Style the links
+*/
+
+const SortA = styled.a`
+
+`;
+
 
 class Location extends React.Component {
   constructor(props) {
@@ -110,6 +131,150 @@ class Location extends React.Component {
       }
     }
     return this.setState({ reviews: tempReviews, reviewCounter: (this.state.reviewCounter + PAGE_LENGTH) });
+  };
+
+  LatestSort = () => {
+    this.setState({ reviewCounter: 0 });
+    const { location_id } = this.props.match.params;
+    const query = `
+    query {
+      location(_id:"${location_id}") {
+        placename
+        reviews(sort:"latest") {
+          user {
+            _id
+            username
+            registered
+          }
+          _id
+          text
+          stars
+          posted
+        }
+      }
+    }
+    `;
+    axios.post('/graphql', { query }).then(async (response) => {
+      const { location } = response.status === 200 ? response.data.data : {};
+      if (location.reviews.length > PAGE_LENGTH) {
+        let tempReviews = [];
+        for (let i = 0; i < PAGE_LENGTH; i++) {
+          tempReviews.push(location.reviews[i]);
+        }
+        this.setState({ location: response.data.data.location, reviews: tempReviews });
+      }
+      else {
+        this.setState({ location: response.data.data.location, reviews: location.reviews });
+      }
+    });
+  };
+
+  OldestSort = () => {
+    this.setState({ reviewCounter: 0 });
+    const { location_id } = this.props.match.params;
+    const query = `
+    query {
+      location(_id:"${location_id}") {
+        placename
+        reviews(sort:"oldest") {
+          user {
+            _id
+            username
+            registered
+          }
+          _id
+          text
+          stars
+          posted
+        }
+      }
+    }
+    `;
+    axios.post('/graphql', { query }).then(async (response) => {
+      const { location } = response.status === 200 ? response.data.data : {};
+      if (location.reviews.length > PAGE_LENGTH) {
+        let tempReviews = [];
+        for (let i = 0; i < PAGE_LENGTH; i++) {
+          tempReviews.push(location.reviews[i]);
+        }
+        this.setState({ location: response.data.data.location, reviews: tempReviews });
+      }
+      else {
+        this.setState({ location: response.data.data.location, reviews: location.reviews });
+      }
+    });
+  };
+
+  BestSort = () => {
+    this.setState({ reviewCounter: 0 });
+    const { location_id } = this.props.match.params;
+    const query = `
+    query {
+      location(_id:"${location_id}") {
+        placename
+        reviews(sort:"best") {
+          user {
+            _id
+            username
+            registered
+          }
+          _id
+          text
+          stars
+          posted
+        }
+      }
+    }
+    `;
+    axios.post('/graphql', { query }).then(async (response) => {
+      const { location } = response.status === 200 ? response.data.data : {};
+      if (location.reviews.length > PAGE_LENGTH) {
+        let tempReviews = [];
+        for (let i = 0; i < PAGE_LENGTH; i++) {
+          tempReviews.push(location.reviews[i]);
+        }
+        this.setState({ location: response.data.data.location, reviews: tempReviews });
+      }
+      else {
+        this.setState({ location: response.data.data.location, reviews: location.reviews });
+      }
+    });
+  };
+
+  WorstSort = () => {
+    this.setState({ reviewCounter: 0 });
+    const { location_id } = this.props.match.params;
+    const query = `
+    query {
+      location(_id:"${location_id}") {
+        placename
+        reviews(sort:"worst") {
+          user {
+            _id
+            username
+            registered
+          }
+          _id
+          text
+          stars
+          posted
+        }
+      }
+    }
+    `;
+    axios.post('/graphql', { query }).then(async (response) => {
+      const { location } = response.status === 200 ? response.data.data : {};
+      if (location.reviews.length > PAGE_LENGTH) {
+        let tempReviews = [];
+        for (let i = 0; i < PAGE_LENGTH; i++) {
+          tempReviews.push(location.reviews[i]);
+        }
+        this.setState({ location: response.data.data.location, reviews: tempReviews });
+      }
+      else {
+        this.setState({ location: response.data.data.location, reviews: location.reviews });
+      }
+    });
   };
 
   messager = (message) => {
@@ -255,6 +420,14 @@ class Location extends React.Component {
         ) : (
           <p>Log in to add your review of this location...</p>
         )}
+        <SortDiv>
+        {`Sort By
+        `}
+        <SortA onClick={this.LatestSort}>Latest&nbsp;&nbsp;&nbsp;</SortA>
+        <SortA onClick={this.OldestSort}>Oldest&nbsp;&nbsp;&nbsp;</SortA>
+        <SortA onClick={this.BestSort}>Best&nbsp;&nbsp;&nbsp;</SortA>
+        <SortA onClick={this.WorstSort}>Worst</SortA>
+        </SortDiv>
         <RevWrap>
           {reviews.map((rev, i) => (
             <Review
