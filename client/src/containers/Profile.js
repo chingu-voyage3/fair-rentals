@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { Helmet } from 'react-helmet';
 
 import Review from './Review/Review';
 import {
@@ -136,6 +137,9 @@ class Profile extends React.Component {
     } = this.state;
     return (
       <BigDiv>
+      <Helmet>
+        <title>{`${username}'s Profile`}</title>
+      </Helmet>
         <Left>
           <Avatar src={fixedAvi || blankAvatar} alt="user avatar" />
           <MedText>

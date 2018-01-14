@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import styled from 'styled-components';
+import { Helmet } from 'react-helmet';
 
 import AddReview from '../AddReview/AddReview';
 import Review from '../Review/Review';
@@ -215,6 +216,9 @@ class Location extends React.Component {
     if (message.length) {
       return (
         <BigDiv>
+          <Helmet>
+            <title>{`${placename} Reviews`}</title>
+          </Helmet>
           <MedText>{message}</MedText>
         </BigDiv>
       );
@@ -222,6 +226,9 @@ class Location extends React.Component {
     if (loading || !location) {
       return (
         <BigDiv style={{ paddingTop: '10rem' }}>
+          <Helmet>
+            <title>{`${placename} Reviews`}</title>
+          </Helmet>
           <Loading />
         </BigDiv>
       );
@@ -229,6 +236,9 @@ class Location extends React.Component {
 
     return (
       <BigDiv>
+        <Helmet>
+          <title>{`${placename} Reviews`}</title>
+        </Helmet>
         <Left>
           <MedText>{placename}</MedText>
         </Left>
