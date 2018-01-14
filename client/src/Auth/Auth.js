@@ -23,7 +23,6 @@ export default class Auth {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
-        history.replace('/');
       } else if (err) {
         history.replace('/');
         console.log(err);
@@ -38,14 +37,16 @@ export default class Auth {
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);
+    localStorage.setItem('username', authResult.idTokenPayload.nickname);
     const graphQLGetUserQuery = `{authUser(auth_id: "${
       authResult.idTokenPayload.sub
     }") { username avatar registered _id } }`;
-    axios
+    return axios
       .post('/graphql', { query: graphQLGetUserQuery })
       .then((response) => {
         try {
           this.setMongoSession(response.data.data.authUser);
+          history.go(-2);
         } catch (e) {
           this.createNewUser(authResult);
         }
@@ -53,8 +54,6 @@ export default class Auth {
       .catch((error) => {
         console.log('likely network error in Auth.js: ', error);
       });
-    // navigate to the home route (this only triggers if catch above is run)
-    return history.replace('/');
   };
   createNewUser = (authResult) => {
     const graphQLAddUser = `
