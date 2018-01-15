@@ -114,11 +114,27 @@ const start = async () => {
         locationGoogle: async (root, { place_id }) =>
           prepare(await Locations.findOne({ place_id })),
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
-        getRecents: async (root, { num }) =>
-          Reviews.find({})
+        getRecents: async (root, { num }) => {
+          let reviewArr = [];
+          let locationArr = [];
+          Reviews.find()
             .sort({ last_edited: -1 })
-            .limit(num)
-            .toArray(),
+            .forEach((review) => {
+              if (reviewArr.length === num) {
+                return;
+              }
+              if (locationArr.includes(review.location_id)) {
+                return;
+              }
+              else {
+                //console.log(reviews);
+                reviewArr.push(review);
+                locationArr.push(review.location_id);
+              }
+            });
+          return console.log(reviewArr);
+
+        },
       },
       User: {
         reviews: async ({ _id }) => (await Reviews.find({ user_id: _id }).toArray()).map(prepare),
