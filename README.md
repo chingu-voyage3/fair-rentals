@@ -4,5 +4,6 @@ Fair Rentals is an attempt to bring more fairness to the rental world. Renters c
 
 
 ### Tech Stack
-* The front-end is a Single Page React App bootstrapped using Create-React-App.
-* The back-end is written in Node and Express. It uses a hosted MongoDB instance on mLab as it's database and exposes a GraphQL endpoint.
+* MERN (MongoDB, Express.js, React, Node.js) with GraphQL (Apollo Client and Server).
+* We use a hosted MongoDB database on mLab due to Heroku limitations.
+* Auth0 for Oauth based authentication.
