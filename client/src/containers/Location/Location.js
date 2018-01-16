@@ -134,7 +134,7 @@ class Location extends React.Component {
   };
 
   LatestSort = () => {
-    let location = {...this.state.location};
+    const { location } = this.state;
     location.reviews.sort((a,b) => {
       return b.posted - a.posted;
     });
@@ -150,7 +150,7 @@ class Location extends React.Component {
   };
 
   OldestSort = () => {
-    let location = {...this.state.location};
+    const { location } = this.state;
     location.reviews.sort((a,b) => {
       return a.posted - b.posted;
     });
@@ -166,7 +166,7 @@ class Location extends React.Component {
   };
 
   BestSort = () => {
-    let location = {...this.state.location};
+    const { location } = this.state;
     location.reviews.sort((a,b) => {
       return b.stars - a.stars;
     });
@@ -182,7 +182,7 @@ class Location extends React.Component {
   };
 
   WorstSort = () => {
-    let location = {...this.state.location};
+    const { location } = this.state;
     location.reviews.sort((a,b) => {
       return a.stars - b.stars;
     });
