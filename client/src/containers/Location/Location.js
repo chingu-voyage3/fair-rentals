@@ -134,8 +134,6 @@ class Location extends React.Component {
   };
 
   LatestSort = () => {
-    this.setState({ reviewCounter: 0 });
-
     let location = {...this.state.location};
     location.reviews.sort((a,b) => {
       return b.posted - a.posted;
@@ -146,15 +144,14 @@ class Location extends React.Component {
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      this.setState({ location: location, reviews: tempReviews });
+      this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
     }
     else {
-      this.setState({ location: location, reviews: location.reviews });
+      this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
     }
   };
 
   OldestSort = () => {
-    this.setState({ reviewCounter: 0 });
     let location = {...this.state.location};
     location.reviews.sort((a,b) => {
       return a.posted - b.posted;
@@ -165,15 +162,14 @@ class Location extends React.Component {
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      this.setState({ location: location, reviews: tempReviews });
+      this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
     }
     else {
-      this.setState({ location: location, reviews: location.reviews });
+      this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
     }
   };
 
   BestSort = () => {
-    this.setState({ reviewCounter: 0 });
     let location = {...this.state.location};
     location.reviews.sort((a,b) => {
       return b.stars - a.stars;
@@ -184,15 +180,14 @@ class Location extends React.Component {
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      this.setState({ location: location, reviews: tempReviews });
+      this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
     }
     else {
-      this.setState({ location: location, reviews: location.reviews });
+      this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
     }
   };
 
   WorstSort = () => {
-    this.setState({ reviewCounter: 0 });
     let location = {...this.state.location};
     location.reviews.sort((a,b) => {
       return a.stars - b.stars;
@@ -203,10 +198,10 @@ class Location extends React.Component {
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      this.setState({ location: location, reviews: tempReviews });
+      this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
     }
     else {
-      this.setState({ location: location, reviews: location.reviews });
+      this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
     }
   };
 
