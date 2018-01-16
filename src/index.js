@@ -117,22 +117,21 @@ const start = async () => {
         getRecents: async (root, { num }) => {
           let reviewArr = [];
           let locationArr = [];
-          Reviews.find()
-            .sort({ last_edited: -1 })
-            .forEach((review) => {
-              if (reviewArr.length === num) {
-                return;
-              }
-              if (locationArr.includes(review.location_id)) {
-                return;
-              }
-              else {
-                //console.log(reviews);
-                reviewArr.push(review);
-                locationArr.push(review.location_id);
-              }
-            });
-          return console.log(reviewArr);
+          const cursor = Reviews.find()
+            .sort({ last_edited: -1 });
+
+          for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
+            if (reviewArr.length === num) {
+              break;
+            }
+            if (locationArr.includes(doc.location_id)) {
+              continue;
+            }
+            reviewArr.push(doc);
+            locationArr.push(doc.location_id);
+          }
+
+          return reviewArr;
 
         },
       },
