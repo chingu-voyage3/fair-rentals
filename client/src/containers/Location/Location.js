@@ -135,146 +135,79 @@ class Location extends React.Component {
 
   LatestSort = () => {
     this.setState({ reviewCounter: 0 });
-    const { location_id } = this.props.match.params;
-    const query = `
-    query {
-      location(_id:"${location_id}") {
-        placename
-        reviews(sort:"latest") {
-          user {
-            _id
-            username
-            registered
-          }
-          _id
-          text
-          stars
-          posted
-        }
-      }
-    }
-    `;
-    axios.post('/graphql', { query }).then(async (response) => {
-      const { location } = response.status === 200 ? response.data.data : {};
-      if (location.reviews.length > PAGE_LENGTH) {
-        let tempReviews = [];
-        for (let i = 0; i < PAGE_LENGTH; i++) {
-          tempReviews.push(location.reviews[i]);
-        }
-        this.setState({ location: response.data.data.location, reviews: tempReviews });
-      }
-      else {
-        this.setState({ location: response.data.data.location, reviews: location.reviews });
-      }
+
+    let location = {...this.state.location};
+    location.reviews.sort((a,b) => {
+      return b.posted - a.posted;
     });
+
+    if (location.reviews.length > PAGE_LENGTH) {
+      let tempReviews = [];
+      for (let i = 0; i < PAGE_LENGTH; i++) {
+        tempReviews.push(location.reviews[i]);
+      }
+      this.setState({ location: location, reviews: tempReviews });
+    }
+    else {
+      this.setState({ location: location, reviews: location.reviews });
+    }
   };
 
   OldestSort = () => {
     this.setState({ reviewCounter: 0 });
-    const { location_id } = this.props.match.params;
-    const query = `
-    query {
-      location(_id:"${location_id}") {
-        placename
-        reviews(sort:"oldest") {
-          user {
-            _id
-            username
-            registered
-          }
-          _id
-          text
-          stars
-          posted
-        }
-      }
-    }
-    `;
-    axios.post('/graphql', { query }).then(async (response) => {
-      const { location } = response.status === 200 ? response.data.data : {};
-      if (location.reviews.length > PAGE_LENGTH) {
-        let tempReviews = [];
-        for (let i = 0; i < PAGE_LENGTH; i++) {
-          tempReviews.push(location.reviews[i]);
-        }
-        this.setState({ location: response.data.data.location, reviews: tempReviews });
-      }
-      else {
-        this.setState({ location: response.data.data.location, reviews: location.reviews });
-      }
+    let location = {...this.state.location};
+    location.reviews.sort((a,b) => {
+      return a.posted - b.posted;
     });
+
+    if (location.reviews.length > PAGE_LENGTH) {
+      let tempReviews = [];
+      for (let i = 0; i < PAGE_LENGTH; i++) {
+        tempReviews.push(location.reviews[i]);
+      }
+      this.setState({ location: location, reviews: tempReviews });
+    }
+    else {
+      this.setState({ location: location, reviews: location.reviews });
+    }
   };
 
   BestSort = () => {
     this.setState({ reviewCounter: 0 });
-    const { location_id } = this.props.match.params;
-    const query = `
-    query {
-      location(_id:"${location_id}") {
-        placename
-        reviews(sort:"best") {
-          user {
-            _id
-            username
-            registered
-          }
-          _id
-          text
-          stars
-          posted
-        }
-      }
-    }
-    `;
-    axios.post('/graphql', { query }).then(async (response) => {
-      const { location } = response.status === 200 ? response.data.data : {};
-      if (location.reviews.length > PAGE_LENGTH) {
-        let tempReviews = [];
-        for (let i = 0; i < PAGE_LENGTH; i++) {
-          tempReviews.push(location.reviews[i]);
-        }
-        this.setState({ location: response.data.data.location, reviews: tempReviews });
-      }
-      else {
-        this.setState({ location: response.data.data.location, reviews: location.reviews });
-      }
+    let location = {...this.state.location};
+    location.reviews.sort((a,b) => {
+      return b.stars - a.stars;
     });
+
+    if (location.reviews.length > PAGE_LENGTH) {
+      let tempReviews = [];
+      for (let i = 0; i < PAGE_LENGTH; i++) {
+        tempReviews.push(location.reviews[i]);
+      }
+      this.setState({ location: location, reviews: tempReviews });
+    }
+    else {
+      this.setState({ location: location, reviews: location.reviews });
+    }
   };
 
   WorstSort = () => {
     this.setState({ reviewCounter: 0 });
-    const { location_id } = this.props.match.params;
-    const query = `
-    query {
-      location(_id:"${location_id}") {
-        placename
-        reviews(sort:"worst") {
-          user {
-            _id
-            username
-            registered
-          }
-          _id
-          text
-          stars
-          posted
-        }
-      }
-    }
-    `;
-    axios.post('/graphql', { query }).then(async (response) => {
-      const { location } = response.status === 200 ? response.data.data : {};
-      if (location.reviews.length > PAGE_LENGTH) {
-        let tempReviews = [];
-        for (let i = 0; i < PAGE_LENGTH; i++) {
-          tempReviews.push(location.reviews[i]);
-        }
-        this.setState({ location: response.data.data.location, reviews: tempReviews });
-      }
-      else {
-        this.setState({ location: response.data.data.location, reviews: location.reviews });
-      }
+    let location = {...this.state.location};
+    location.reviews.sort((a,b) => {
+      return a.stars - b.stars;
     });
+
+    if (location.reviews.length > PAGE_LENGTH) {
+      let tempReviews = [];
+      for (let i = 0; i < PAGE_LENGTH; i++) {
+        tempReviews.push(location.reviews[i]);
+      }
+      this.setState({ location: location, reviews: tempReviews });
+    }
+    else {
+      this.setState({ location: location, reviews: location.reviews });
+    }
   };
 
   messager = (message) => {

@@ -286,6 +286,7 @@ const start = async () => {
           try {
             const deletedUser = prepare(await Users.findOne({ _id: ObjectId(args._id) }));
             await Users.deleteOne({ _id: ObjectId(args._id) });
+            await Reviews.deleteMany({ user_id: args._id });
             return deletedUser;
           } catch (err) {
             return console.log(err);
