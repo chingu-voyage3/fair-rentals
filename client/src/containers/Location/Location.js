@@ -109,7 +109,7 @@ class Location extends React.Component {
 
   PrevPageHandler = () => {
     if (!this.state.multiplePages || this.state.reviewCounter === 0 ) {
-      return console.log("No other page to navigate to!")
+      return;
     }
     let tempReviews = [];
     for (let i = (this.state.reviewCounter - PAGE_LENGTH); i < this.state.reviewCounter; i++) {
@@ -122,7 +122,7 @@ class Location extends React.Component {
 
   NextPageHandler = () => {
     if (!this.state.multiplePages || this.state.reviewCounter >= (this.state.location.reviews.length - PAGE_LENGTH) ) {
-      return console.log("No other page to navigate to!")
+      return;
     }
     let tempReviews = [];
     for (let i = (this.state.reviewCounter + PAGE_LENGTH); i < (this.state.reviewCounter + (PAGE_LENGTH * 2)); i++) {
@@ -139,16 +139,14 @@ class Location extends React.Component {
       return b.posted - a.posted;
     });
 
-    if (location.reviews.length > PAGE_LENGTH) {
+    if (this.state.multiplePages) {
       let tempReviews = [];
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
+      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
     }
-    else {
-      this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
-    }
+    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
   };
 
   OldestSort = () => {
@@ -157,16 +155,14 @@ class Location extends React.Component {
       return a.posted - b.posted;
     });
 
-    if (location.reviews.length > PAGE_LENGTH) {
+    if (this.state.multiplePages) {
       let tempReviews = [];
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
+      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
     }
-    else {
-      this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
-    }
+    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
   };
 
   BestSort = () => {
@@ -175,16 +171,14 @@ class Location extends React.Component {
       return b.stars - a.stars;
     });
 
-    if (location.reviews.length > PAGE_LENGTH) {
+    if (this.state.multiplePages) {
       let tempReviews = [];
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
+      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
     }
-    else {
-      this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
-    }
+    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
   };
 
   WorstSort = () => {
@@ -193,16 +187,14 @@ class Location extends React.Component {
       return a.stars - b.stars;
     });
 
-    if (location.reviews.length > PAGE_LENGTH) {
+    if (this.state.multiplePages) {
       let tempReviews = [];
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
+      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
     }
-    else {
-      this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
-    }
+    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
   };
 
   messager = (message) => {
@@ -310,7 +302,7 @@ class Location extends React.Component {
       return (
         <BigDiv>
           <Helmet>
-            <title>{`${placename} Reviews`}</title>
+            <title>{`Fair Reviews`}</title>
           </Helmet>
           <MedText>{message}</MedText>
         </BigDiv>
@@ -320,7 +312,7 @@ class Location extends React.Component {
       return (
         <BigDiv style={{ paddingTop: '10rem' }}>
           <Helmet>
-            <title>{`${placename} Reviews`}</title>
+            <title>{`Fair Reviews`}</title>
           </Helmet>
           <Loading />
         </BigDiv>
