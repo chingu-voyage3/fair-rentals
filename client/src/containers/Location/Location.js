@@ -85,6 +85,7 @@ class Location extends React.Component {
           text
           stars
           posted
+          last_edited
         }
       }
     }

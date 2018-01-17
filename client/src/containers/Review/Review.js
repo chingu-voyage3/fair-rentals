@@ -56,6 +56,7 @@ class Review extends React.Component {
   render() {
     const { rev, the_reviewers_id, handleDelete } = this.props;
     const { user_id } = this.state;
+    const edited = (rev.posted !== rev.last_edited) ? true : false;
     let topLine;
     let linkTo;
     if (rev.location) {
@@ -79,7 +80,13 @@ class Review extends React.Component {
         </TopLine>
         <Stars stars={rev.stars} outOf={5} full="#134999" empty="#fff" stroke="#000" />
         <RevText>{rev.text}</RevText>
-        <PostedText>review posted {new Date(rev.posted).toDateString()}</PostedText>
+        <PostedText>
+          { edited ? (
+            review edited {new Date(rev.last_edited).toDateString()}
+          ) : (
+            review posted {new Date(rev.posted).toDateString()}
+          )}
+        </PostedText>
       </RevWrap>
     );
   }
