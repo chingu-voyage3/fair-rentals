@@ -25,6 +25,9 @@ export const BigDiv = styled.div`
   justify-content: flex-start;
   align-items: center;
   background-image: linear-gradient(180deg, #efefef 10%, #efefef 70%, steelblue);
+  @media (max-width: 450px) {
+    height: 100%;
+  }
 `;
 
 export const Left = styled.div`

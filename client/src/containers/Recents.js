@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 
 const RecentWrap = styled.div`
   margin-top: 4em;
-  height: 16em;
+  min-height: 16em;
   width: 100%;
   background: #fff;
   display: flex;
@@ -17,12 +17,18 @@ const RecentWrap = styled.div`
 `;
 
 const RecentRowItem = styled.div`
-  height: 14em;
   width: 100%;
+  overflow: auto;
   display: flex;
   flex-flow: row nowrap;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
+  transition: 0.35s all;
+  @media (max-width: 450px) {
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    height: 1000px;
+  }
 `;
 
 const Item = styled.div`
@@ -38,6 +44,10 @@ const Item = styled.div`
   max-width: 180px;
   height: 160px;
   font-size: 0.75em;
+  @media (max-width: 450px) {
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+  }
 `;
 
 class Recents extends React.Component {

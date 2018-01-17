@@ -19,7 +19,10 @@ const Menu = styled.nav`
   background: #eee;
   transition: 0.35s all;
   > a {
-    margin: 0.5rem 2rem 0.5em 0.5em;
+    margin: 0.5rem 2rem 0.5rem 0.5rem;
+    @media (max-width: 450px) {
+      margin: 0.5rem 0rem 0.5rem 0rem;
+    }
   }
   @media (max-width: 450px) {
     justify-content: space-around;
