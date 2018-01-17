@@ -117,8 +117,7 @@ const start = async () => {
         getRecents: async (root, { num }) => {
           let reviewArr = [];
           let locationArr = [];
-          const cursor = Reviews.find()
-            .sort({ last_edited: -1 });
+          const cursor = Reviews.find().sort({ last_edited: -1 });
 
           for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
             if (reviewArr.length === num) {
@@ -286,6 +285,7 @@ const start = async () => {
           try {
             const deletedUser = prepare(await Users.findOne({ _id: ObjectId(args._id) }));
             await Users.deleteOne({ _id: ObjectId(args._id) });
+            await Reviews.deleteMany({ user_id: args._id });
             return deletedUser;
           } catch (err) {
             return console.log(err);
