@@ -6,6 +6,7 @@ import { Button } from '../../utils/shared-styles';
 
 const ReviewForm = styled.form`
   width: 100%;
+  min-height: 300px;
   padding-bottom: 1em;
   border-bottom: 1px solid steelblue;
   display: flex;
@@ -22,8 +23,8 @@ const TextInput = styled.textarea`
   border: none;
   width: 40rem;
   max-width: 90%;
-  height: 8rem;
-  min-height: 2rem;
+  height: 6rem;
+  min-height: 6rem;
 `;
 const Score = styled.input`
   font: 1.125rem 'Slabo 27px', Helvetica, sans-serif;
