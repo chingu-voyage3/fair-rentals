@@ -155,9 +155,9 @@ class Location extends React.Component {
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
+      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0, howSorted: "latest" });
     }
-    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
+    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0, howSorted: "latest" });
   };
 
   OldestSort = () => {
@@ -171,9 +171,9 @@ class Location extends React.Component {
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
+      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0, howSorted: "oldest" });
     }
-    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
+    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0, howSorted: "oldest" });
   };
 
   BestSort = () => {
@@ -187,9 +187,9 @@ class Location extends React.Component {
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
+      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0, howSorted: "best" });
     }
-    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
+    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0, howSorted: "best" });
   };
 
   WorstSort = () => {
@@ -203,9 +203,9 @@ class Location extends React.Component {
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0 });
+      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0, howSorted: "worst" });
     }
-    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0 });
+    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0, howSorted: "worst" });
   };
 
   messager = (message) => {
