@@ -6,35 +6,21 @@ const LoginWrap = styled.nav`
   border-top: 1px solid steelblue;
   border-bottom: 1px solid steelblue;
   background: #ddd;
-  width: 100%;
-  height: 3rem;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: flex-end;
-  align-items: center;
-  @media (max-width: 450px) {
-    justify-content: space-around;
-  }
+  padding: 1em 0 1em 0;
 `;
 
 const AuthBtn = styled.button`
   border: none;
-  margin-right: 2rem;
+  float: right;
+  margin-right: 2em;
   text-decoration: none;
   color: steelblue;
   font: inherit;
   cursor: pointer;
-  @media (max-width: 450px) {
-    margin-right: 0;
-  }
 `;
 
-const UserP = styled.p`
-  margin-right: auto;
+const UserP = styled.span`
   margin-left: 2em;
-  @media (max-width: 450px) {
-    margin: 0.5rem 0 0.5rem 0;
-  }
 `;
 
 class Login extends React.Component {
