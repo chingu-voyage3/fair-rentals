@@ -6,7 +6,8 @@ import { Button } from '../../utils/shared-styles';
 
 const ReviewForm = styled.form`
   width: 100%;
-  padding: 10%;
+  padding-bottom: 1em;
+  border-bottom: 1px solid steelblue;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;

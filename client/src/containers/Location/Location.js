@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus, no-console */
 import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -33,26 +34,22 @@ const NextPageButton = styled.button`
 `;
 
 const SortDiv = styled.div`
-  display: block;
-  position: relative;
-  width: 200px;
-  right:-120px;
-  top: 20px;
-  width: 50px;
-  height: 100px;
+  margin-top: 1em;
 `;
-
-/*
-  It's actually probably more efficient to just sort the Reviews
-  that were retrieved initially and stored in  state.location.
-
-  TODO Style the links
-*/
 
 const SortA = styled.a`
-
+  color: ${props => (props.active ? 'white' : 'black')};
+  background: ${props => (props.active ? 'black' : 'none')};
+  border: 1px solid black;
+  cursor: pointer;
+  padding: 1px 4px 1px 4px;
+  margin-left: .5em;
+  border-radius: 6px;
 `;
 
+const PaginationBtnWrap = styled.span`
+  padding-bottom: 2em;
+`;
 
 class Location extends React.Component {
   constructor(props) {
@@ -65,6 +62,7 @@ class Location extends React.Component {
       multiplePages: false,
       reviews: [],
       reviewCounter: 0,
+      howSorted: 'latest', // enum: 'latest', 'oldest', 'best', 'worst'
     };
   }
   componentWillMount() {
@@ -95,46 +93,62 @@ class Location extends React.Component {
       const { location } = response.status === 200 ? response.data.data : {};
       const existingReview = await this.findExistingReview(location.reviews);
       if (location.reviews.length > PAGE_LENGTH) {
-        let tempReviews = [];
+        const tempReviews = [];
         for (let i = 0; i < PAGE_LENGTH; i++) {
           tempReviews.push(location.reviews[i]);
         }
-        this.setState({ location: response.data.data.location, existingReview, loading: false, multiplePages: true, reviews: tempReviews });
-      }
-      else {
-        this.setState({ location: response.data.data.location, existingReview, loading: false, reviews: location.reviews });
+        this.setState({
+          location, existingReview, loading: false, multiplePages: true, reviews: tempReviews,
+        });
+      } else {
+        this.setState({
+          location, existingReview, loading: false, reviews: location.reviews,
+        });
       }
     });
   };
 
   PrevPageHandler = () => {
-    if (!this.state.multiplePages || this.state.reviewCounter === 0 ) {
-      return console.log("No other page to navigate to!")
+    if (!this.state.multiplePages || this.state.reviewCounter === 0) {
+      return console.log('No other page to navigate to!');
     }
-    let tempReviews = [];
+    const tempReviews = [];
     for (let i = (this.state.reviewCounter - PAGE_LENGTH); i < this.state.reviewCounter; i++) {
       if (this.state.location.reviews[i]) {
         tempReviews.push(this.state.location.reviews[i]);
       }
     }
-    return this.setState({ reviews: tempReviews, reviewCounter: (this.state.reviewCounter - PAGE_LENGTH) });
+    return this.setState({
+      reviews: tempReviews,
+      reviewCounter: (this.state.reviewCounter - PAGE_LENGTH),
+    });
   };
 
   NextPageHandler = () => {
-    if (!this.state.multiplePages || this.state.reviewCounter >= (this.state.location.reviews.length - PAGE_LENGTH) ) {
-      return console.log("No other page to navigate to!")
+    if (
+      !this.state.multiplePages ||
+      this.state.reviewCounter >= (this.state.location.reviews.length - PAGE_LENGTH)
+    ) {
+      return console.log('No other page to navigate to!');
     }
-    let tempReviews = [];
-    for (let i = (this.state.reviewCounter + PAGE_LENGTH); i < (this.state.reviewCounter + (PAGE_LENGTH * 2)); i++) {
+    const tempReviews = [];
+    for (
+      let i = (this.state.reviewCounter + PAGE_LENGTH);
+      i < (this.state.reviewCounter + (PAGE_LENGTH * 2));
+      i++
+    ) {
       if (this.state.location.reviews[i]) {
         tempReviews.push(this.state.location.reviews[i]);
       }
     }
-    return this.setState({ reviews: tempReviews, reviewCounter: (this.state.reviewCounter + PAGE_LENGTH) });
+    return this.setState({
+      reviews: tempReviews,
+      reviewCounter: (this.state.reviewCounter + PAGE_LENGTH),
+    });
   };
 
   LatestSort = () => {
-    this.setState({ reviewCounter: 0 });
+    this.setState({ reviewCounter: 0, howSorted: 'latest' });
     const { location_id } = this.props.match.params;
     const query = `
     query {
@@ -157,20 +171,19 @@ class Location extends React.Component {
     axios.post('/graphql', { query }).then(async (response) => {
       const { location } = response.status === 200 ? response.data.data : {};
       if (location.reviews.length > PAGE_LENGTH) {
-        let tempReviews = [];
+        const tempReviews = [];
         for (let i = 0; i < PAGE_LENGTH; i++) {
           tempReviews.push(location.reviews[i]);
         }
-        this.setState({ location: response.data.data.location, reviews: tempReviews });
-      }
-      else {
-        this.setState({ location: response.data.data.location, reviews: location.reviews });
+        this.setState({ location, reviews: tempReviews });
+      } else {
+        this.setState({ location, reviews: location.reviews });
       }
     });
   };
 
   OldestSort = () => {
-    this.setState({ reviewCounter: 0 });
+    this.setState({ reviewCounter: 0, howSorted: 'oldest' });
     const { location_id } = this.props.match.params;
     const query = `
     query {
@@ -193,20 +206,19 @@ class Location extends React.Component {
     axios.post('/graphql', { query }).then(async (response) => {
       const { location } = response.status === 200 ? response.data.data : {};
       if (location.reviews.length > PAGE_LENGTH) {
-        let tempReviews = [];
+        const tempReviews = [];
         for (let i = 0; i < PAGE_LENGTH; i++) {
           tempReviews.push(location.reviews[i]);
         }
         this.setState({ location: response.data.data.location, reviews: tempReviews });
-      }
-      else {
+      } else {
         this.setState({ location: response.data.data.location, reviews: location.reviews });
       }
     });
   };
 
   BestSort = () => {
-    this.setState({ reviewCounter: 0 });
+    this.setState({ reviewCounter: 0, howSorted: 'best' });
     const { location_id } = this.props.match.params;
     const query = `
     query {
@@ -229,20 +241,19 @@ class Location extends React.Component {
     axios.post('/graphql', { query }).then(async (response) => {
       const { location } = response.status === 200 ? response.data.data : {};
       if (location.reviews.length > PAGE_LENGTH) {
-        let tempReviews = [];
+        const tempReviews = [];
         for (let i = 0; i < PAGE_LENGTH; i++) {
           tempReviews.push(location.reviews[i]);
         }
         this.setState({ location: response.data.data.location, reviews: tempReviews });
-      }
-      else {
+      } else {
         this.setState({ location: response.data.data.location, reviews: location.reviews });
       }
     });
   };
 
   WorstSort = () => {
-    this.setState({ reviewCounter: 0 });
+    this.setState({ reviewCounter: 0, howSorted: 'worst' });
     const { location_id } = this.props.match.params;
     const query = `
     query {
@@ -265,13 +276,12 @@ class Location extends React.Component {
     axios.post('/graphql', { query }).then(async (response) => {
       const { location } = response.status === 200 ? response.data.data : {};
       if (location.reviews.length > PAGE_LENGTH) {
-        let tempReviews = [];
+        const tempReviews = [];
         for (let i = 0; i < PAGE_LENGTH; i++) {
           tempReviews.push(location.reviews[i]);
         }
         this.setState({ location: response.data.data.location, reviews: tempReviews });
-      }
-      else {
+      } else {
         this.setState({ location: response.data.data.location, reviews: location.reviews });
       }
     });
@@ -340,9 +350,6 @@ class Location extends React.Component {
       .then((response) => {
         if (response.status === 200) {
           this.messager('Done!');
-          // const returnedId = response.data.data.editReview
-          //   ? response.data.data.editReview._id
-          //   : response.data.data.createReview._id;
           return this.getLocationData();
         }
         return this.setState({ loading: false }, () => this.messager('Something fouled up'));
@@ -421,12 +428,12 @@ class Location extends React.Component {
           <p>Log in to add your review of this location...</p>
         )}
         <SortDiv>
-        {`Sort By
+          {`Sort By
         `}
-        <SortA onClick={this.LatestSort}>Latest&nbsp;&nbsp;&nbsp;</SortA>
-        <SortA onClick={this.OldestSort}>Oldest&nbsp;&nbsp;&nbsp;</SortA>
-        <SortA onClick={this.BestSort}>Best&nbsp;&nbsp;&nbsp;</SortA>
-        <SortA onClick={this.WorstSort}>Worst</SortA>
+          <SortA active={this.state.howSorted === 'latest'} onClick={this.LatestSort}>Latest</SortA>
+          <SortA active={this.state.howSorted === 'oldest'} onClick={this.OldestSort}>Oldest</SortA>
+          <SortA active={this.state.howSorted === 'best'} onClick={this.BestSort}>Best</SortA>
+          <SortA active={this.state.howSorted === 'worst'} onClick={this.WorstSort}>Worst</SortA>
         </SortDiv>
         <RevWrap>
           {reviews.map((rev, i) => (
@@ -435,15 +442,16 @@ class Location extends React.Component {
               the_reviewers_id={rev.user._id}
               key={rev._id}
               rev={rev}
-              index={i}
             />
           ))}
         </RevWrap>
-        <span>
+        {this.state.multiplePages &&
+        <PaginationBtnWrap>
           <PrevPageButton onClick={this.PrevPageHandler}>&#8249; Previous</PrevPageButton>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <NextPageButton onClick={this.NextPageHandler}>Next &#8250;</NextPageButton>
-        </span>
+        </PaginationBtnWrap>
+        }
       </BigDiv>
     );
   }

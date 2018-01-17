@@ -14,7 +14,6 @@ const LoginWrap = styled.nav`
   align-items: center;
   @media (max-width: 450px) {
     justify-content: space-around;
-    font-size: 0.75rem;
   }
 `;
 
@@ -25,6 +24,9 @@ const AuthBtn = styled.button`
   color: steelblue;
   font: inherit;
   cursor: pointer;
+  @media (max-width: 450px) {
+    margin-right: 0;
+  }
 `;
 
 const UserP = styled.p`
@@ -38,11 +40,11 @@ const UserP = styled.p`
 class Login extends React.Component {
   constructor(auth) {
     super(auth);
-    this.state = {...auth, un:localStorage.getItem('username')};
-  };
+    this.state = { ...auth, un: localStorage.getItem('username') };
+  }
 
   setUn() {
-    return this.setState({ un: localStorage.getItem('username')});
+    return this.setState({ un: localStorage.getItem('username') });
   }
 
   render() {
@@ -51,13 +53,18 @@ class Login extends React.Component {
     }
     return (
       <LoginWrap>
-        {this.state.auth.isAuthenticated() && this.state.un && <UserP>Welcome, {this.state.un}</UserP>}
-        {!this.state.auth.isAuthenticated() && <AuthBtn onClick={this.state.auth.login}>Log In</AuthBtn>}
-        {this.state.auth.isAuthenticated() && <AuthBtn onClick={this.state.auth.logout}>Log Out</AuthBtn>}
+        {this.state.auth.isAuthenticated() &&
+          this.state.un && <UserP>Welcome, {this.state.un}</UserP>}
+        {!this.state.auth.isAuthenticated() && (
+          <AuthBtn onClick={this.state.auth.login}>Log In</AuthBtn>
+        )}
+        {this.state.auth.isAuthenticated() && (
+          <AuthBtn onClick={this.state.auth.logout}>Log Out</AuthBtn>
+        )}
       </LoginWrap>
     );
   }
-};
+}
 
 Login.propTypes = {
   auth: object.isRequired, // eslint-disable-line

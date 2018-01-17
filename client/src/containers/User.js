@@ -78,8 +78,7 @@ class User extends React.Component {
           <p>Member since {new Date(registered).toDateString()}</p>
         </Left>
         <RevWrap>
-          {reviews.length > 0 &&
-            reviews.map((rev, i) => <Review key={rev._id} rev={rev} index={i} />)}
+          {reviews.length > 0 && reviews.map((rev, i) => <Review key={rev._id} rev={rev} />)}
         </RevWrap>
       </BigDiv>
     );

@@ -4,7 +4,28 @@ import { Link } from 'react-router-dom';
 import Stars from 'simple-rating-stars';
 import styled from 'styled-components';
 
-import './review.css';
+const RevWrap = styled.div`
+  border-radius: 4px;
+  padding: 0.25rem 1rem;
+  margin: 0.5rem;
+  background: #eee;
+  border: 1px solid #999;
+  font-family: 'Slabo 27px', Helvetica, sans-serif;
+`;
+
+const TopLine = styled.p`
+  font-style: italic;
+`;
+
+const RevText = styled.p`
+  font-size: 1rem;
+`;
+
+const PostedText = styled.p`
+  font-size: 0.8rem;
+  text-align: right;
+  color: grey;
+`;
 
 const DeleteButton = styled.button`
   color: #eee;
@@ -33,11 +54,8 @@ class Review extends React.Component {
   }
 
   render() {
-    const {
-      rev, index, the_reviewers_id, handleDelete,
-    } = this.props;
+    const { rev, the_reviewers_id, handleDelete } = this.props;
     const { user_id } = this.state;
-    const timing = 0.25 + 0.25 * index;
     let topLine;
     let linkTo;
     if (rev.location) {
@@ -48,8 +66,8 @@ class Review extends React.Component {
       linkTo = `/user/${rev.user._id}`;
     }
     return (
-      <div style={{ animationDelay: `${timing}s` }} className="review-wrap">
-        <p className="top-line">
+      <RevWrap>
+        <TopLine>
           <Link to={linkTo}>{topLine}</Link>
           {/* if logged in AND it's your review, delete button appears */}
           {user_id &&
@@ -58,11 +76,11 @@ class Review extends React.Component {
                 delete
               </DeleteButton>
             )}
-        </p>
+        </TopLine>
         <Stars stars={rev.stars} outOf={5} full="#134999" empty="#fff" stroke="#000" />
-        <p className="review-text">{rev.text}</p>
-        <p className="posted-text">review posted {new Date(rev.posted).toDateString()}</p>
-      </div>
+        <RevText>{rev.text}</RevText>
+        <PostedText>review posted {new Date(rev.posted).toDateString()}</PostedText>
+      </RevWrap>
     );
   }
 }
@@ -70,7 +88,6 @@ class Review extends React.Component {
 Review.propTypes = {
   the_reviewers_id: PropTypes.string,
   handleDelete: PropTypes.func.isRequired,
-  index: PropTypes.number.isRequired,
   rev: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     location: PropTypes.shape({
