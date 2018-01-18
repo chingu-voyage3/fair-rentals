@@ -34,10 +34,10 @@ export default class Auth {
   setSession = (authResult) => {
     // Set the time that the access token will expire at
     const expiresAt = JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime());
-    localStorage.setItem('access_token', authResult.accessToken);
-    localStorage.setItem('id_token', authResult.idToken);
-    localStorage.setItem('expires_at', expiresAt);
-    localStorage.setItem('username', authResult.idTokenPayload.nickname);
+    sessionStorage.setItem('access_token', authResult.accessToken);
+    sessionStorage.setItem('id_token', authResult.idToken);
+    sessionStorage.setItem('expires_at', expiresAt);
+    sessionStorage.setItem('username', authResult.idTokenPayload.nickname);
     const graphQLGetUserQuery = `{authUser(auth_id: "${
       authResult.idTokenPayload.sub
     }") { username avatar registered _id } }`;
@@ -76,22 +76,22 @@ export default class Auth {
   };
 
   setMongoSession = (createUser) => {
-    localStorage.setItem('avatar', createUser.avatar);
-    localStorage.setItem('username', createUser.username);
-    localStorage.setItem('registered', createUser.registered);
-    localStorage.setItem('_id', createUser._id);
+    sessionStorage.setItem('avatar', createUser.avatar);
+    sessionStorage.setItem('username', createUser.username);
+    sessionStorage.setItem('registered', createUser.registered);
+    sessionStorage.setItem('_id', createUser._id);
   };
 
   logout = () => {
     // Clear access token and ID token from local storage
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('id_token');
-    localStorage.removeItem('expires_at');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('id_token');
+    sessionStorage.removeItem('expires_at');
     // ...and also our user stuff
-    localStorage.removeItem('avatar');
-    localStorage.removeItem('username');
-    localStorage.removeItem('registered');
-    localStorage.removeItem('_id');
+    sessionStorage.removeItem('avatar');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('registered');
+    sessionStorage.removeItem('_id');
     // navigate to the home route
     history.replace('/');
   };
@@ -99,7 +99,7 @@ export default class Auth {
   isAuthenticated = () => {
     // Check whether the current time is past the
     // access token's expiry time
-    const expiresAt = JSON.parse(localStorage.getItem('expires_at'));
+    const expiresAt = JSON.parse(sessionStorage.getItem('expires_at'));
     return new Date().getTime() < expiresAt;
   };
 }
