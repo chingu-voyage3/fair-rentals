@@ -71,7 +71,7 @@ class Recents extends React.Component {
         getRecents(num: ${num}) {
           text
           stars
-          posted
+          last_edited
           user {
             _id
             username
@@ -97,7 +97,7 @@ class Recents extends React.Component {
             {
               text: 'Something went wrong',
               stars: 0,
-              posted: 1,
+              last_edited: 1,
               user: {
                 username: 'The App',
                 _id: 0,
@@ -116,7 +116,7 @@ class Recents extends React.Component {
       if (a === null) return null;
       const shortened = a.text.length > 80 ? `${a.text.substring(0, 80)}...` : a.text;
       return (
-        <Item key={a.posted}>
+        <Item key={a.last_edited}>
           <p>
             <Link to={`/location/${a.location._id}`}>{a.location.placename}</Link>
           </p>
@@ -124,7 +124,7 @@ class Recents extends React.Component {
           <p>{shortened}</p>
           <p style={{ justifySelf: 'flex-end' }}>
             ~ <Link to={`/user/${a.user._id}`}>{a.user.username}</Link>,{' '}
-            {new Date(a.posted).toDateString()}
+            {new Date(a.last_edited).toDateString()}
           </p>
         </Item>
       );
