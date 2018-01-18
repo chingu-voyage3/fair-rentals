@@ -6,4 +6,4 @@ const localStorageMock = {
   clear: jest.fn(),
 };
 
-global.localStorage = localStorageMock;
+global.sessionStorage = localStorageMock;

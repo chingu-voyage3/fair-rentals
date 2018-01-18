@@ -46,7 +46,7 @@ class Review extends React.Component {
 
   componentWillMount() {
     try {
-      const user_id = localStorage.getItem('_id');
+      const user_id = sessionStorage.getItem('_id');
       return this.setState({ user_id });
     } catch (e) {
       return null;

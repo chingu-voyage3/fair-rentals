@@ -26,11 +26,11 @@ const UserP = styled.span`
 class Login extends React.Component {
   constructor(auth) {
     super(auth);
-    this.state = { ...auth, un: localStorage.getItem('username') };
+    this.state = { ...auth, un: sessionStorage.getItem('username') };
   }
 
   setUn() {
-    return this.setState({ un: localStorage.getItem('username') });
+    return this.setState({ un: sessionStorage.getItem('username') });
   }
 
   render() {

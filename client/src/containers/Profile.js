@@ -41,7 +41,7 @@ class Profile extends React.Component {
   }
 
   getReviews = () => {
-    const _id = localStorage.getItem('_id');
+    const _id = sessionStorage.getItem('_id');
     const userQuery = `
     query {
       user(_id:"${_id}") {
@@ -67,10 +67,10 @@ class Profile extends React.Component {
   };
 
   getUserFromStorage = () => {
-    const username = localStorage.getItem('username');
-    const avatar = localStorage.getItem('avatar');
-    const registered = parseInt(localStorage.getItem('registered'), 10);
-    const _id = localStorage.getItem('_id');
+    const username = sessionStorage.getItem('username');
+    const avatar = sessionStorage.getItem('avatar');
+    const registered = parseInt(sessionStorage.getItem('registered'), 10);
+    const _id = sessionStorage.getItem('_id');
     this.setState({
       fixedName: username,
       fixedAvi: avatar,

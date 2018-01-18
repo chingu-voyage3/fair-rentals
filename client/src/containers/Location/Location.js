@@ -216,7 +216,7 @@ class Location extends React.Component {
   };
 
   findExistingReview = (reviews) => {
-    const user_id = localStorage.getItem('_id');
+    const user_id = sessionStorage.getItem('_id');
     if (!user_id || !reviews) return null;
     const userReview = reviews.filter(rev => rev.user._id === user_id)[0];
     return userReview || null;
@@ -225,7 +225,7 @@ class Location extends React.Component {
   addReview = async (text, stars, review_id) => {
     this.setState({ loading: true });
     const { location_id } = this.props.match.params;
-    const user_id = localStorage.getItem('_id');
+    const user_id = sessionStorage.getItem('_id');
     if (!user_id) {
       return this.messager('How did you get here?!');
     }
@@ -303,7 +303,7 @@ class Location extends React.Component {
     const {
       loading, location, existingReview, message, reviews,
     } = this.state;
-    const user_id = localStorage.getItem('_id');
+    const user_id = sessionStorage.getItem('_id');
     const { placename } = location;
 
     if (message.length) {
