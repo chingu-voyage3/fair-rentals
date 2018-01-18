@@ -60,7 +60,7 @@ class AddReview extends React.Component {
 
   render() {
     const { text, stars, review_id } = this.state;
-    const { addReview } = this.props;
+    const { addReview, existingReview } = this.props;
 
     return (
       <ReviewForm onSubmit={() => addReview(text, stars, review_id)}>
@@ -83,7 +83,11 @@ class AddReview extends React.Component {
           onChange={this.handleChange}
         />
 
-        <Button type="submit">Submit Review</Button>
+        { existingReview ? (
+          <Button type="submit">Edit Review</Button>
+        ) : (
+          <Button type="submit">Submit Review</Button>
+        )}
       </ReviewForm>
     );
   }
