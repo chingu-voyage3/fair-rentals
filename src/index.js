@@ -10,10 +10,6 @@ require('dotenv').config();
 
 const PORT = process.env.PORT || 3333;
 const { MONGO_URL } = process.env;
-const googleMapsClient = require('@google/maps').createClient({
-  key: process.env.GOOG_KEY,
-  Promise,
-});
 
 const prepare = (o) => {
   if (!o) return null;
@@ -115,8 +111,8 @@ const start = async () => {
           prepare(await Locations.findOne({ place_id })),
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
         getRecents: async (root, { num }) => {
-          let reviewArr = [];
-          let locationArr = [];
+          const reviewArr = [];
+          const locationArr = [];
           const cursor = Reviews.find().sort({ last_edited: -1 });
 
           for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
@@ -129,9 +125,7 @@ const start = async () => {
             reviewArr.push(doc);
             locationArr.push(doc.location_id);
           }
-
           return reviewArr;
-
         },
       },
       User: {
@@ -316,41 +310,10 @@ const start = async () => {
 
     const app = express();
 
-    /*
-    * google places API
-    */
-    app.use(express.json());
-
-    app.post('/autocomplete', (req, res) => {
-      const {
-        input, radius, latitude, longitude,
-      } = req.body.data;
-      googleMapsClient
-        .placesAutoComplete({
-          types: 'establishment',
-          location: { latitude, longitude },
-          input,
-          radius,
-        })
-        .asPromise()
-        .then((response) => {
-          if (response.status === 200) {
-            return res.send(response);
-          }
-          return res.send({ message: 'Not found.' });
-        });
-    });
-    /*
-    * end google API
-    */
-
     app.use('/graphql', express.json(), graphqlExpress({ schema }));
     app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
     app.use(express.static(path.join(__dirname, '../client/build')));
-    //Okay I had to add an extra line
-    // next line basically just to get /callback route to react-router on front-end
-    // (static method above doesn't do the trick)
     app.get('*', (req, res) => res.sendFile('index.html', { root: './client/build' }));
 
     app.listen(PORT, () => console.log(`listening on ${PORT}`));
