@@ -55,7 +55,6 @@ class Review extends React.Component {
 
   render() {
     const { rev, the_reviewers_id, handleDelete } = this.props;
-    console.log(rev);
     const { user_id } = this.state;
     const wasEdited = rev.posted !== rev.last_edited;
     let topLine;
