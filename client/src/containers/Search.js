@@ -27,7 +27,7 @@ class Search extends React.Component {
         _id
       }
     }`;
-    console.log(mutation);
+
     axios
       .post('/graphql', { query: mutation })
       .then((res) => {

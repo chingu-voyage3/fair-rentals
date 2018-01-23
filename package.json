@@ -14,7 +14,9 @@
     "start": "npm run build-server && node ./build/main.js",
     "postinstall": "cd client && npm install --only=dev && npm install && npm run build"
   },
-  "cacheDirectories": ["client/node_modules"],
+  "cacheDirectories": [
+    "client/node_modules"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chingu-voyage3/fair-rentals.git"
@@ -27,6 +29,7 @@
   "homepage": "https://github.com/chingu-voyage3/fair-rentals#readme",
   "dependencies": {
     "@google/maps": "^0.4.5",
+    "axios": "^0.17.1",
     "backpack-core": "^0.4.3",
     "concurrently": "^3.5.1",
     "dotenv": "^4.0.0",

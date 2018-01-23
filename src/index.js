@@ -5,6 +5,7 @@ import express from 'express';
 import path from 'path';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
+import axios from  'axios';
 
 require('dotenv').config();
 
@@ -116,16 +117,27 @@ const start = async () => {
           prepare(await Locations.findOne({ place_id })),
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
         getWalkScore: async (root, { _id }) => {
-          const location = await Locations.findOne(ObjectId(_id));
-          const address = `"address=${location.address.split(' ').join('%20')}&"`;
-          const lat = `"lat=${parseFloat(location.lat).toFixed(4)}&"`;
-          const lon = `"lon=${parseFloat(location.lon).toFixed(4)}&"`;
-          const api = `"wsapikey=${WS_API_KEY}"`;
-          const url = `"http://api.walkscore.com/score?format=json&${address}${lat}${lon}${api}"`;
-          let walkScore = 75; //Default "C" Score
-          const response = await axios.post(url);
-          //TODO add stuff here, currently waiting on API Key from WalkScore
-          return walkScore;
+          try {
+            const location = await Locations.findOne(ObjectId(_id));
+            const address = `address=${location.address.split(',').join('').substring(0,location.address.length-3)}&`;
+            const lat = `lat=${parseFloat(location.lat).toFixed(4)}&`;
+            const lon = `lon=${parseFloat(location.lon).toFixed(4)}&`;
+            const api = `wsapikey=${WS_API_KEY}`;
+            const url = encodeURI(`http://api.walkscore.com/score?format=json&${address}${lat}${lon}${api}`);
+            const response = await axios.get(url);
+            if (response.data.status === 1) {
+              const { walkscore } = response.data;
+              return walkscore;
+            }
+            else {
+              const walkscore = undefined;
+              return walkscore;
+            }
+
+          }
+          catch (err) {
+            console.log(err);
+          }
         },
         getRecents: async (root, { num }) => {
           const reviewArr = [];
