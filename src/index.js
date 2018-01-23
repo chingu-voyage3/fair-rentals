@@ -119,19 +119,21 @@ const start = async () => {
         getWalkScore: async (root, { _id }) => {
           try {
             const location = await Locations.findOne(ObjectId(_id));
-            const address = `address=${location.address.split(',').join('').substring(0,location.address.length-3)}&`;
-            const lat = `lat=${parseFloat(location.lat).toFixed(4)}&`;
-            const lon = `lon=${parseFloat(location.lon).toFixed(4)}&`;
-            const api = `wsapikey=${WS_API_KEY}`;
-            const url = encodeURI(`http://api.walkscore.com/score?format=json&${address}${lat}${lon}${api}`);
-            const response = await axios.get(url);
-            if (response.data.status === 1) {
-              const { walkscore } = response.data;
-              return walkscore;
-            }
-            else {
-              const walkscore = undefined;
-              return walkscore;
+            if (location.address) {
+              const address = `address=${location.address.split(',').join('').substring(0,location.address.length-3)}&`;
+              const lat = `lat=${parseFloat(location.lat).toFixed(4)}&`;
+              const lon = `lon=${parseFloat(location.lon).toFixed(4)}&`;
+              const api = `wsapikey=${WS_API_KEY}`;
+              const url = encodeURI(`http://api.walkscore.com/score?format=json&${address}${lat}${lon}${api}`);
+              const response = await axios.get(url);
+              if (response.data.status === 1) {
+                const { walkscore } = response.data;
+                return walkscore;
+              }
+              else {
+                const walkscore = undefined;
+                return walkscore;
+              }
             }
 
           }
