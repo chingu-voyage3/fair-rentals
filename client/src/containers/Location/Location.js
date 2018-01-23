@@ -7,8 +7,9 @@ import { Helmet } from 'react-helmet';
 
 import AddReview from '../AddReview/AddReview';
 import Review from '../Review/Review';
+import WalkScore from '../WalkScore';
 import Loading from '../../utils/Loading';
-import { BigDiv, MedText, Left, RevWrap } from '../../utils/shared-styles';
+import { BigDiv, MedText, Left, RevWrap, LittleLeft } from '../../utils/shared-styles';
 
 import './location.css';
 
@@ -63,10 +64,15 @@ class Location extends React.Component {
       reviews: [],
       reviewCounter: 0,
       howSorted: 'latest', // enum: 'latest', 'oldest', 'best', 'worst'
+      walkscore: 0,
     };
   }
   componentWillMount() {
     this.getLocationData();
+  }
+
+  componentDidMount() {
+    this.getWalkScore();
   }
 
   getLocationData = () => {
@@ -108,6 +114,22 @@ class Location extends React.Component {
       }
     });
   };
+
+  getWalkScore = () => {
+    const { location_id } = this.props.match.params;
+    const query = `
+    query {
+      getWalkScore(_id:"${location_id}")
+    }
+    `;
+    axios.post('/graphql', { query }).then(async (response) => {
+      const walkscore = response.status === 200 ? response.data.data.getWalkScore : {};
+      if (walkscore) {
+        return this.setState({ walkscore: walkscore });
+      }
+    })
+    .catch( err => console.log('Error fetching walkscore', err) );
+  }
 
   PrevPageHandler = () => {
     if (!this.state.multiplePages || this.state.reviewCounter === 0 ) {
@@ -302,7 +324,7 @@ class Location extends React.Component {
 
   render() {
     const {
-      loading, location, existingReview, message, reviews,
+      loading, location, existingReview, message, reviews, walkscore,
     } = this.state;
     const user_id = sessionStorage.getItem('_id');
     const { placename } = location;
@@ -336,6 +358,13 @@ class Location extends React.Component {
         <Left>
           <MedText>{placename}</MedText>
         </Left>
+        {walkscore ? (
+          <LittleLeft>
+            <WalkScore
+              score={walkscore}
+            />
+          </LittleLeft>
+        ) : null}
         {/* if logged in, AddReview component appears */}
         {user_id ? (
           <AddReview
