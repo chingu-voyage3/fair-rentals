@@ -5,72 +5,21 @@ import axios from 'axios';
 import styled from 'styled-components';
 import { Helmet } from 'react-helmet';
 
-import { BigText, MedText, BigDiv } from '../utils/shared-styles';
+import GoogleMapComponent from './GoogleMap';
+import { MedText, BigDiv } from '../utils/shared-styles';
 
-const SearchForm = styled.form`
-  width: 60%;
+const SearchMapContainer = styled.div`
+  width: 80%;
   min-width: 440px;
-  height: 400px;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-start;
-  align-items: center;
+  height: 500px;
 `;
 
-const SearchInput = styled.input`
+const LoadingNote = styled.p`
+  color: indianred;
   font-size: 1.25em;
-  width: 85%;
-  height: 1.5em;
-`;
-
-const OneOption = styled.button`
-  font-size: 1.1em;
-  border: none;
-  width: 100%;
-  text-align: left;
-  padding: 0.25em 0.125em 0.25em 0.125em;
-  color: #222;
-  cursor: pointer;
-  &:hover,
-  &:focus {
-    color: #eee;
-    background-color: #222;
-  }
-`;
-
-const OptionWrap = styled.div`
-  width: 85%;
-  border: 1px solid black;
+  text-align: center;
 `;
 class Search extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      input: '',
-      options: [],
-      message: '',
-    };
-  }
-  messager = (message) => {
-    setTimeout(() => {
-      this.setState({ message: '' });
-    }, 2000);
-    return this.setState({ message });
-  };
-
-  handleFormSubmit = (e) => {
-    e.preventDefault();
-    return false;
-    // how to handle the form Submit, separate from a click on one of the options?
-    // submit whatever's first on the current this.state.options array, maybe?
-    // (and if none, return false)
-    // UPDATE: weirdly, this seems to be the default behavior?
-  };
-
-  submitPlace = (place_id, placename) => {
-    this.check_for_existing(place_id, placename);
-  };
-
   create_new_location = (place_id, placename) => {
     const mutation = `
     mutation {
@@ -107,76 +56,28 @@ class Search extends React.Component {
       .catch(err => this.messager(`Error querying for location: ${err}`));
   };
 
-  handleClick = (e) => {
-    e.preventDefault();
-    const place_id = e.target.id;
-    const placename = e.target.value;
-    this.submitPlace(place_id, placename);
-  };
-
-  handleChange = (e) => {
-    e.preventDefault();
-    const input = e.target.value.toString();
-    this.setState({ [e.target.name]: input });
-    if (input.length < 1) return null;
+  render() {
     const { latitude, longitude } = this.props.coords
       ? this.props.coords
-      : { latitude: 30, longitude: -90 };
-    const data = {
-      input,
-      latitude,
-      longitude,
-      radius: 20000,
-    };
-    return axios
-      .post('/autocomplete', { data })
-      .then((response) => {
-        if (response.status === 200) {
-          try {
-            const placesObj = response.data.json.predictions.map(p => ({
-              longname: p.description,
-              placename: p.structured_formatting.main_text,
-              place_id: p.place_id,
-            }));
-            return this.setState({ options: placesObj });
-          } catch (servererror) {
-            this.setState({ options: [] });
-            return this.messager(`Autocomplete server error: ${servererror}`);
-          }
-        }
-        // this next line should be unreachable, but just in case...
-        return this.messager('Something went wrong with the autocomplete');
-      })
-      .catch(err => this.messager(`Autocomplete catch: ${err}`));
-  };
-
-  render() {
-    const { input, options, message } = this.state;
+      : { latitude: 30.0, longitude: -90 };
     return (
       <BigDiv>
-      <Helmet>
-        <title>{`Location Search`}</title>
-      </Helmet>
-        <BigText>Search</BigText>
-        <MedText>{message}</MedText>
-        <SearchForm onSubmit={this.handleFormSubmit}>
-          <SearchInput type="text" name="input" value={input} onChange={this.handleChange} />
-          {options.length > 0 && (
-            <OptionWrap>
-              {options.map(a => (
-                <OneOption
-                  key={a.place_id}
-                  id={a.place_id}
-                  value={a.placename}
-                  onClick={this.handleClick}
-                >
-                  {a.longname}
-                </OneOption>
-              ))}
-            </OptionWrap>
+        <Helmet>
+          <title>Location Search</title>
+        </Helmet>
+        <MedText>Search</MedText>
+        <p>Search for a location, then click its red map-marker to read or write a review.</p>
+        <SearchMapContainer>
+          {latitude !== 30.0 ? (
+            <GoogleMapComponent
+              latitude={latitude}
+              longitude={longitude}
+              handleClick={this.check_for_existing}
+            />
+          ) : (
+            <LoadingNote>Map loading... this app requires your browser location.</LoadingNote>
           )}
-          <input style={{ visibility: 'hidden' }} type="submit" />
-        </SearchForm>
+        </SearchMapContainer>
       </BigDiv>
     );
   }

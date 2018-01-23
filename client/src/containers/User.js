@@ -32,6 +32,10 @@ class User extends React.Component {
   }
 
   componentWillMount() {
+    this.getUser();
+  }
+
+  getUser = () => {
     const { user_id } = this.props.match.params;
     const userQuery = `
     query {
@@ -56,9 +60,25 @@ class User extends React.Component {
     axios.post('/graphql', { query: userQuery }).then((response) => {
       this.setState({ user: response.data.data.user, loading: false });
     });
-  }
+  };
 
-  componentWillUnmount() {}
+  handleDelete = (e) => {
+    e.preventDefault();
+    const _id = e.target.name;
+    if (!_id) return null;
+    const deleteReview = `
+      mutation {
+        deleteReview(review_id:"${_id}") {
+          _id
+        }
+      }
+    `;
+    return axios
+      .post('/graphql', { query: deleteReview })
+      .then(() => this.getUser())
+      .catch(err => this.messager(`deleting error: ${err}`));
+  };
+
   render() {
     const { loading } = this.state;
     if (loading || !this.state.user) {
@@ -79,7 +99,10 @@ class User extends React.Component {
           <p>Member since {new Date(registered).toDateString()}</p>
         </Left>
         <RevWrap>
-          {reviews.length > 0 && reviews.map((rev, i) => <Review key={rev._id} rev={rev} />)}
+          {reviews.length > 0 &&
+            reviews.map((rev, i) => (
+              <Review handleDelete={this.handleDelete} key={rev._id} rev={rev} />
+            ))}
         </RevWrap>
       </BigDiv>
     );

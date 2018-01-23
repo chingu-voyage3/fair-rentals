@@ -109,7 +109,6 @@ class Profile extends React.Component {
         this.setState({ message: '' });
       }, 2000);
     }
-    // TODO: editUser mutation doesn't exist yet
     const graphQLEditUser = `
     mutation {
       editUser(
