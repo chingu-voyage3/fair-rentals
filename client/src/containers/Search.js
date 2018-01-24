@@ -20,13 +20,14 @@ const LoadingNote = styled.p`
   text-align: center;
 `;
 class Search extends React.Component {
-  create_new_location = (place_id, placename) => {
+  create_new_location = (place_id, placename, geo, address) => {
     const mutation = `
     mutation {
-      createLocation(place_id: "${place_id}", placename: "${placename}") {
+      createLocation(place_id: "${place_id}",placename: "${placename}",address: "${address}",lat: "${geo.lat}",lon: "${geo.lon}") {
         _id
       }
     }`;
+
     axios
       .post('/graphql', { query: mutation })
       .then((res) => {
@@ -35,10 +36,10 @@ class Search extends React.Component {
         }
         return this.props.history.push(`/location/${res.data.data.createLocation._id}`);
       })
-      .catch(err => this.messager(`Error adding new location: ${err}`));
+      .catch(err => console.log(`Error adding new location: ${err}`));
   };
 
-  check_for_existing = (place_id, placename) => {
+  check_for_existing = (place_id, placename, geo, address) => {
     const query = `
     query {
       locationGoogle(place_id:"${place_id}") {
@@ -50,7 +51,7 @@ class Search extends React.Component {
       .post('/graphql', { query })
       .then((res) => {
         if (res.errors) return this.messager(res.errors);
-        if (!res.data.data.locationGoogle) return this.create_new_location(place_id, placename);
+        if (!res.data.data.locationGoogle) return this.create_new_location(place_id, placename, geo, address);
         return this.props.history.push(`/location/${res.data.data.locationGoogle._id}`);
       })
       .catch(err => this.messager(`Error querying for location: ${err}`));

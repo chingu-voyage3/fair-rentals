@@ -55,11 +55,17 @@ const MapWithASearchBox = compose(
               bounds.extend(place.geometry.location);
             }
           });
-          const nextMarkers = places.map(place => ({
+          let nextMarkers = places.map(place => ({
             placename: place.name,
             place_id: place.place_id,
+            address: place.formatted_address,
             position: place.geometry.location,
+            geo: {
+              lat: place.geometry.location.lat(),
+              lon: place.geometry.location.lng()
+            }
           }));
+
           const nextCenter = _.get(nextMarkers, '0.position', this.state.center);
 
           this.setState({
@@ -106,7 +112,7 @@ const MapWithASearchBox = compose(
     </SearchBox>
     {props.markers.map((marker, index) => (
       <Marker
-        onClick={() => props.handleClick(marker.place_id, marker.placename)}
+        onClick={() => props.handleClick(marker.place_id, marker.placename, marker.geo, marker.address)}
         key={index} // eslint-disable-line
         position={marker.position}
       />
