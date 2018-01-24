@@ -9,13 +9,18 @@ import history from './history';
 import './App.css';
 
 import Splash from './containers/Splash/Splash';
-import Header from './containers/Header';
+import Login from './containers/Login';
 import Search from './containers/Search';
 import User from './containers/User';
 import Profile from './containers/Profile';
 import Location from './containers/Location/Location';
 import FourOhFour from './utils/FourOhFour';
-import AddReview from './containers/AddReview/AddReview';
+
+const splash_bg = '/pexels-photo-243722.jpeg';
+const loc_bg = '/pexels-photo-243722.jpeg';
+const user_bg = '/pexels-photo-243722.jpeg';
+const profile_bg = '/pexels-photo-243722.jpeg';
+const search_bg = '/world_map.png';
 
 const auth = new Auth();
 
@@ -29,7 +34,11 @@ const AuthRoute = ({ component: Component, ...rest }) => (
   <Route
     {...rest}
     render={props =>
-      (auth.isAuthenticated() ? <Component auth={auth} {...props} /> : <Redirect to="/note" />)
+      (auth.isAuthenticated() ? (
+        <Component bg={profile_bg} auth={auth} {...props} />
+      ) : (
+        <Redirect to="/note" />
+      ))
     }
   />
 );
@@ -40,17 +49,20 @@ AuthRoute.propTypes = {
 const App = () => (
   <Router history={history}>
     <div>
-      <Header auth={auth} />
+      <Login auth={auth} />
       <Switch>
-        <Route exact path="/" component={Splash} />
-        <Route path="/search" component={Search} />
-        <AuthRoute path="/add-review" component={AddReview} />
+        <Route exact path="/" render={props => <Splash bg={splash_bg} {...props} />} />
+        <Route path="/search" render={props => <Search bg={search_bg} {...props} />} />
+        {/* <Route path="/search" component={Search} /> */}
         <AuthRoute path="/profile" component={Profile} />
         <Route
           path="/location/:location_id"
-          render={props => <Location auth={auth} {...props} />}
+          render={props => <Location auth={auth} bg={loc_bg} {...props} />}
         />
-        <Route path="/user/:user_id" render={props => <User auth={auth} {...props} />} />
+        <Route
+          path="/user/:user_id"
+          render={props => <User auth={auth} bg={user_bg} {...props} />}
+        />
         <Route
           path="/callback"
           render={(props) => {

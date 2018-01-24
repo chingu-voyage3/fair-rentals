@@ -3,7 +3,7 @@
 exports[`Star renders stars should render 1`] = `
 <div>
   <svg
-    fill="steelblue"
+    fill="#185263"
     height="24"
     stroke="#000"
     viewBox="0 0 24 24"
@@ -15,7 +15,7 @@ exports[`Star renders stars should render 1`] = `
     />
   </svg>
   <svg
-    fill="steelblue"
+    fill="#185263"
     height="24"
     stroke="#000"
     viewBox="0 0 24 24"
@@ -27,7 +27,7 @@ exports[`Star renders stars should render 1`] = `
     />
   </svg>
   <svg
-    fill="steelblue"
+    fill="#185263"
     height="24"
     stroke="#000"
     viewBox="0 0 24 24"

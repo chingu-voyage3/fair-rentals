@@ -2,19 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import axios from 'axios';
+import Helmet from 'react-helmet';
 
-import Loading from '../utils/Loading';
-import { BigDiv, MedText, Avatar } from '../utils/shared-styles';
 import Review from './Review/Review';
+
 import blankAvatar from '../utils/avatar-blank.jpg';
+import Loading from '../utils/Loading';
+import { BigDiv, MedText, Avatar, Left } from '../utils/shared-styles';
+import SmallBillboard from '../utils/SmallBillboard';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
-
-const Left = styled.div`
-  max-height: 200px;
-  align-self: flex-start;
-  padding: 4em 0em 0em 1em;
-`;
 
 const RevWrap = styled.div`
   padding: 1rem;
@@ -32,6 +29,7 @@ class User extends React.Component {
   }
 
   componentWillMount() {
+    document.body.style.background = `url(${this.props.bg}) no-repeat center center / cover`;
     this.getUser();
   }
 
@@ -93,6 +91,8 @@ class User extends React.Component {
     } = this.state.user;
     return (
       <BigDiv>
+        <Helmet>Fair Rentals profile for {username}</Helmet>
+        <SmallBillboard />
         <Left>
           <Avatar src={avatar || blankAvatar} alt="user avatar" />
           <MedText>{username}</MedText>
@@ -110,6 +110,7 @@ class User extends React.Component {
 }
 
 User.propTypes = {
+  bg: PropTypes.string.isRequired,
   match: PropTypes.object.isRequired, // eslint-disable-line
 };
 

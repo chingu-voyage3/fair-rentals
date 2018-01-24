@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Button } from '../../utils/shared-styles';
+import { Button } from '../utils/shared-styles';
 
 const ReviewForm = styled.form`
   width: 100%;
   min-height: 300px;
   padding-bottom: 1em;
-  border-bottom: 1px solid steelblue;
+  border-bottom: 1px solid #185263;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
@@ -20,7 +20,9 @@ const Label = styled.label`
 `;
 const TextInput = styled.textarea`
   font: 1rem 'Slabo 27px', Helvetica, sans-serif;
-  border: none;
+  padding: 1em;
+  border: 1px solid black;
+  border-radius: 5px;
   width: 40rem;
   max-width: 90%;
   height: 6rem;
@@ -83,7 +85,7 @@ class AddReview extends React.Component {
           onChange={this.handleChange}
         />
 
-        { existingReview ? (
+        {existingReview ? (
           <Button type="submit">Edit Review</Button>
         ) : (
           <Button type="submit">Submit Review</Button>

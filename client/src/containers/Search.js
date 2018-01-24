@@ -7,6 +7,7 @@ import { Helmet } from 'react-helmet';
 
 import GoogleMapComponent from './GoogleMap';
 import { MedText, BigDiv } from '../utils/shared-styles';
+import SmallBillboard from '../utils/SmallBillboard';
 
 const SearchMapContainer = styled.div`
   width: 80%;
@@ -20,6 +21,10 @@ const LoadingNote = styled.p`
   text-align: center;
 `;
 class Search extends React.Component {
+  componentWillMount() {
+    document.body.style.background = `url(${this.props.bg}) no-repeat center center / cover`;
+  }
+
   create_new_location = (place_id, placename) => {
     const mutation = `
     mutation {
@@ -65,6 +70,7 @@ class Search extends React.Component {
         <Helmet>
           <title>Location Search</title>
         </Helmet>
+        <SmallBillboard />
         <MedText>Search</MedText>
         <p>Search for a location, then click its red map-marker to read or write a review.</p>
         <SearchMapContainer>
@@ -84,6 +90,7 @@ class Search extends React.Component {
 }
 
 Search.propTypes = {
+  bg: PropTypes.string.isRequired,
   coords: PropTypes.object, // eslint-disable-line
   history: PropTypes.object.isRequired, // eslint-disable-line
 };

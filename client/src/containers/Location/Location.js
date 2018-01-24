@@ -5,10 +5,11 @@ import axios from 'axios';
 import styled from 'styled-components';
 import { Helmet } from 'react-helmet';
 
-import AddReview from '../AddReview/AddReview';
+import AddReview from '../AddReview';
 import Review from '../Review/Review';
 import Loading from '../../utils/Loading';
 import { BigDiv, MedText, Left, RevWrap } from '../../utils/shared-styles';
+import SmallBillboard from '../../utils/SmallBillboard';
 
 import './location.css';
 
@@ -66,6 +67,7 @@ class Location extends React.Component {
     };
   }
   componentWillMount() {
+    document.body.style.background = `url(${this.props.bg}) no-repeat center center / cover`;
     this.getLocationData();
   }
 
@@ -110,8 +112,8 @@ class Location extends React.Component {
   };
 
   PrevPageHandler = () => {
-    if (!this.state.multiplePages || this.state.reviewCounter === 0 ) {
-      return;
+    if (!this.state.multiplePages || this.state.reviewCounter === 0) {
+      return null;
     }
     const tempReviews = [];
     for (let i = (this.state.reviewCounter - PAGE_LENGTH); i < this.state.reviewCounter; i++) {
@@ -126,8 +128,11 @@ class Location extends React.Component {
   };
 
   NextPageHandler = () => {
-    if (!this.state.multiplePages || this.state.reviewCounter >= (this.state.location.reviews.length - PAGE_LENGTH) ) {
-      return;
+    if (
+      !this.state.multiplePages ||
+      this.state.reviewCounter >= (this.state.location.reviews.length - PAGE_LENGTH)
+    ) {
+      return null;
     }
     const tempReviews = [];
     for (
@@ -147,66 +152,74 @@ class Location extends React.Component {
 
   LatestSort = () => {
     const { location } = this.state;
-    location.reviews.sort((a,b) => {
-      return b.posted - a.posted;
-    });
+    location.reviews.sort((a, b) => b.posted - a.posted);
 
     if (this.state.multiplePages) {
-      let tempReviews = [];
+      const tempReviews = [];
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0, howSorted: "latest" });
+      return this.setState({
+        location, reviews: tempReviews, reviewCounter: 0, howSorted: 'latest',
+      });
     }
-    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0, howSorted: "latest" });
+    return this.setState({
+      location, reviews: location.reviews, reviewCounter: 0, howSorted: 'latest',
+    });
   };
 
   OldestSort = () => {
     const { location } = this.state;
-    location.reviews.sort((a,b) => {
-      return a.posted - b.posted;
-    });
+    location.reviews.sort((a, b) => a.posted - b.posted);
 
     if (this.state.multiplePages) {
-      let tempReviews = [];
+      const tempReviews = [];
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0, howSorted: "oldest" });
+      return this.setState({
+        location, reviews: tempReviews, reviewCounter: 0, howSorted: 'oldest',
+      });
     }
-    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0, howSorted: "oldest" });
+    return this.setState({
+      location, reviews: location.reviews, reviewCounter: 0, howSorted: 'oldest',
+    });
   };
 
   BestSort = () => {
     const { location } = this.state;
-    location.reviews.sort((a,b) => {
-      return b.stars - a.stars;
-    });
+    location.reviews.sort((a, b) => b.stars - a.stars);
 
     if (this.state.multiplePages) {
-      let tempReviews = [];
+      const tempReviews = [];
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0, howSorted: "best" });
+      return this.setState({
+        location, reviews: tempReviews, reviewCounter: 0, howSorted: 'best',
+      });
     }
-    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0, howSorted: "best" });
+    return this.setState({
+      location, reviews: location.reviews, reviewCounter: 0, howSorted: 'best',
+    });
   };
 
   WorstSort = () => {
     const { location } = this.state;
-    location.reviews.sort((a,b) => {
-      return a.stars - b.stars;
-    });
+    location.reviews.sort((a, b) => a.stars - b.stars);
 
     if (this.state.multiplePages) {
-      let tempReviews = [];
+      const tempReviews = [];
       for (let i = 0; i < PAGE_LENGTH; i++) {
         tempReviews.push(location.reviews[i]);
       }
-      return this.setState({ location: location, reviews: tempReviews, reviewCounter: 0, howSorted: "worst" });
+      return this.setState({
+        location, reviews: tempReviews, reviewCounter: 0, howSorted: 'worst',
+      });
     }
-    return this.setState({ location: location, reviews: location.reviews, reviewCounter: 0, howSorted: "worst" });
+    return this.setState({
+      location, reviews: location.reviews, reviewCounter: 0, howSorted: 'worst',
+    });
   };
 
   messager = (message) => {
@@ -311,7 +324,7 @@ class Location extends React.Component {
       return (
         <BigDiv>
           <Helmet>
-            <title>{`Fair Reviews`}</title>
+            <title>Fair Reviews</title>
           </Helmet>
           <MedText>{message}</MedText>
         </BigDiv>
@@ -321,7 +334,7 @@ class Location extends React.Component {
       return (
         <BigDiv style={{ paddingTop: '10rem' }}>
           <Helmet>
-            <title>{`Fair Reviews`}</title>
+            <title>Fair Reviews</title>
           </Helmet>
           <Loading />
         </BigDiv>
@@ -333,6 +346,7 @@ class Location extends React.Component {
         <Helmet>
           <title>{`${placename} Reviews`}</title>
         </Helmet>
+        <SmallBillboard />
         <Left>
           <MedText>{placename}</MedText>
         </Left>
@@ -380,6 +394,7 @@ class Location extends React.Component {
 }
 
 Location.propTypes = {
+  bg: PropTypes.string.isRequired,
   match: PropTypes.object.isRequired, // eslint-disable-line
 };
 

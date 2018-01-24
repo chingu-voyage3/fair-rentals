@@ -21,7 +21,7 @@ exports[`Review displays a review should render 1`] = `
   </p>
   <div>
     <svg
-      fill="steelblue"
+      fill="#185263"
       height="24"
       stroke="#000"
       viewBox="0 0 24 24"
@@ -33,7 +33,7 @@ exports[`Review displays a review should render 1`] = `
       />
     </svg>
     <svg
-      fill="steelblue"
+      fill="#185263"
       height="24"
       stroke="#000"
       viewBox="0 0 24 24"
@@ -45,7 +45,7 @@ exports[`Review displays a review should render 1`] = `
       />
     </svg>
     <svg
-      fill="steelblue"
+      fill="#185263"
       height="24"
       stroke="#000"
       viewBox="0 0 24 24"
@@ -57,7 +57,7 @@ exports[`Review displays a review should render 1`] = `
       />
     </svg>
     <svg
-      fill="steelblue"
+      fill="#185263"
       height="24"
       stroke="#000"
       viewBox="0 0 24 24"
