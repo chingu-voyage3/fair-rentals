@@ -78,7 +78,7 @@ class Review extends React.Component {
               </DeleteButton>
             )}
         </TopLine>
-        <Stars stars={rev.stars} outOf={5} full="#134999" empty="#fff" stroke="#000" />
+        <Stars stars={rev.stars} outOf={5} full="#185263" empty="#fff" stroke="#000" />
         <RevText>{rev.text}</RevText>
         {wasEdited ? (
           <PostedText> review edited {new Date(rev.last_edited).toDateString()} </PostedText>

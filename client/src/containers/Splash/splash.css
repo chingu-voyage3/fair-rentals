@@ -1,29 +1,9 @@
-#big-link,
-#mobile-title,
-#mobile-sub {
-  transition: 0.15s all;
-}
-
 #big-link {
-  border-radius: 4px;
-  padding: 1rem;
-  color: white;
-  background: steelblue;
-  font-size: 1.5rem;
-}
-
-#big-link:hover {
-  color: #dedede;
-}
-
-@media screen and (max-width: 450px) {
-  #big-link {
-    font-size: 1rem;
-  }
-  #mobile-title {
-    font-size: 2rem;
-  }
-  #mobile-sub {
-    font-size: 1.25rem;
-  }
+  transition: 0.15s all;
+  margin: 1em 0 0 0;
+  padding: 0.5em 3em;
+  background: white;
+  background-image: linear-gradient(-180deg, white 0%, rgba(0, 0, 0, 0.3) 100%);
+  border: 2px solid #154f60;
+  border-radius: 11px;
 }

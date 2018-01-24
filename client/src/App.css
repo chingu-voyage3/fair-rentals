@@ -1,21 +1,17 @@
 body {
   margin: 0;
   padding: 0;
-  background: steelblue;
+  min-height: 100vh;
   box-sizing: border-box;
   font-family: 'Barlow Semi Condensed', Helvetica, sans-serif;
 }
-
 a {
   text-decoration: none;
 }
-
 a,
 a:visited {
-  color: steelblue;
+  color: #185263;
 }
-
 a.active {
-  color: #000;
-  border-bottom: 1px solid #000;
+  color: indianred;
 }

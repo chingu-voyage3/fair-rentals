@@ -6,22 +6,15 @@ import Stars from 'simple-rating-stars';
 import { Link } from 'react-router-dom';
 
 const RecentWrap = styled.div`
-  margin-top: 4em;
-  min-height: 16em;
-  width: 100%;
-  background: #fff;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  align-items: center;
+  width: 80%;
+  margin: 1em 1em 4em 1em;
+  text-align: center;
 `;
-
-const RecentRowItem = styled.div`
+const RecentRow = styled.div`
   width: 100%;
-  overflow: auto;
   display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
+  flex-flow: row wrap;
+  justify-content: space-around;
   align-items: center;
   transition: 0.35s all;
   @media (max-width: 450px) {
@@ -32,7 +25,7 @@ const RecentRowItem = styled.div`
 `;
 
 const Item = styled.div`
-  background: #eee;
+  background: white;
   padding: 0.5em;
   border-radius: 6px;
   margin: 1em;
@@ -40,14 +33,9 @@ const Item = styled.div`
   flex-flow: column nowrap;
   justify-content: flex-start;
   align-items: center;
-  min-width: 140px;
-  max-width: 180px;
+  width: 180px;
   height: 160px;
   font-size: 0.75em;
-  @media (max-width: 450px) {
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-  }
 `;
 
 class Recents extends React.Component {
@@ -65,7 +53,7 @@ class Recents extends React.Component {
   }
 
   getRecentItems = () => {
-    const num = 5;
+    const num = 8;
     const getRecentsQuery = `
       query {
         getRecents(num: ${num}) {
@@ -114,16 +102,18 @@ class Recents extends React.Component {
   renderRecents = array =>
     array.map((a) => {
       if (a === null) return null;
-      const shortened = a.text.length > 80 ? `${a.text.substring(0, 80)}...` : a.text;
+      const shorttext = a.text.length > 80 ? `${a.text.substring(0, 80)}...` : a.text;
+      const shortname =
+        a.user.username.length > 10 ? `${a.user.username.substring(0, 10)}...` : a.user.username;
       return (
         <Item key={a.last_edited}>
           <p>
             <Link to={`/location/${a.location._id}`}>{a.location.placename}</Link>
           </p>
-          <Stars stars={a.stars} outOf={5} full="#134999" empty="#fff" stroke="#000" />
-          <p>{shortened}</p>
-          <p style={{ justifySelf: 'flex-end' }}>
-            ~ <Link to={`/user/${a.user._id}`}>{a.user.username}</Link>,{' '}
+          <Stars stars={a.stars} outOf={5} full="#185263" empty="#fff" stroke="#000" />
+          <p>{shorttext}</p>
+          <p style={{ alignSelf: 'flex-end' }}>
+            ~ <Link to={`/user/${a.user._id}`}>{shortname}</Link>,{' '}
             {new Date(a.last_edited).toDateString()}
           </p>
         </Item>
@@ -134,8 +124,7 @@ class Recents extends React.Component {
     const { recents } = this.state;
     return (
       <RecentWrap>
-        <p>some recent reviews...</p>
-        <RecentRowItem>{recents && this.renderRecents(recents)}</RecentRowItem>
+        <RecentRow>{recents && this.renderRecents(recents)}</RecentRow>
       </RecentWrap>
     );
   }

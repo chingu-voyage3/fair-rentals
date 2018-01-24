@@ -3,20 +3,32 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Helmet } from 'react-helmet';
+import styled from 'styled-components';
 
 import Review from './Review/Review';
-import {
-  BigDiv,
-  MedText,
-  Avatar,
-  Left,
-  RevWrap,
-  Label,
-  Button,
-  CredentialForm,
-  CredentialFormInput,
-} from '../utils/shared-styles';
+import { BigDiv, MedText, Avatar, Left, RevWrap, Button } from '../utils/shared-styles';
+import SmallBillboard from '../utils/SmallBillboard';
 import blankAvatar from '../utils/avatar-blank.jpg';
+
+const Label = styled.label`
+  padding: 0.25rem;
+`;
+
+const CredentialForm = styled.form`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5em;
+`;
+
+const CredentialFormInput = styled.input`
+  font: 1.125rem 'Slabo 27px', Helvetica, sans-serif;
+  border: none;
+  width: 30rem;
+  max-width: 90%;
+  text-align: center;
+`;
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -36,6 +48,7 @@ class Profile extends React.Component {
   }
 
   componentWillMount() {
+    document.body.style.background = `url(${this.props.bg}) no-repeat center center / cover`;
     this.getUserFromStorage();
     this.getReviews();
   }
@@ -136,9 +149,10 @@ class Profile extends React.Component {
     } = this.state;
     return (
       <BigDiv>
-      <Helmet>
-        <title>{`${username}'s Profile`}</title>
-      </Helmet>
+        <Helmet>
+          <title>{`${username}'s Profile`}</title>
+        </Helmet>
+        <SmallBillboard />
         <Left>
           <Avatar src={fixedAvi || blankAvatar} alt="user avatar" />
           <MedText>
@@ -184,6 +198,7 @@ class Profile extends React.Component {
 }
 
 Profile.propTypes = {
+  bg: PropTypes.string.isRequired,
   auth: PropTypes.object.isRequired, //eslint-disable-line
 };
 
