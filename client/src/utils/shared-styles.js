@@ -27,6 +27,11 @@ export const Left = styled.div`
   padding: 3em 0em 0em 1em;
 `;
 
+export const LittleLeft = styled.div`
+  align-self: flex-start;
+  padding: 1em 0em 0em 1em;
+`;
+
 export const RevWrap = styled.div`
   padding: 1rem;
   margin: 1rem;

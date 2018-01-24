@@ -5,11 +5,13 @@ import express from 'express';
 import path from 'path';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
+import axios from  'axios';
 
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3333;
 const { MONGO_URL } = process.env;
+const { WS_API_KEY } = process.env;
 
 const prepare = (o) => {
   if (!o) return null;
@@ -42,6 +44,7 @@ const start = async () => {
         locationGoogle(place_id: String): Location
         review(_id: String): Review
         getRecents(num: Int): [Review]
+        getWalkScore(_id: String): Int
       }
 
       type User {
@@ -59,6 +62,9 @@ const start = async () => {
         placename: String!
         reviews(latest: Int, sort: String): [Review]
         place_id: String!
+        address: String!
+        lat: String!
+        lon: String!
       }
 
       type Review {
@@ -87,7 +93,7 @@ const start = async () => {
 
       type Mutation {
         createUser(auth_id: String!, username: String!, avatar: String): User
-        createLocation(placename: String!, place_id: String!): Location
+        createLocation(placename: String!, place_id: String!, address: String!, lat: String!, lon: String!): Location
         createReview(user_id: String!, location_id: String!, text: String!, stars: String!): Review
         editReview(input: EditReviewInput!): Review
         deleteReview(review_id: String!): Review
@@ -110,6 +116,31 @@ const start = async () => {
         locationGoogle: async (root, { place_id }) =>
           prepare(await Locations.findOne({ place_id })),
         review: async (root, { _id }) => prepare(await Reviews.findOne(ObjectId(_id))),
+        getWalkScore: async (root, { _id }) => {
+          try {
+            const location = await Locations.findOne(ObjectId(_id));
+            if (location.address) {
+              const address = `address=${location.address.split(',').join('').substring(0,location.address.length-3)}&`;
+              const lat = `lat=${parseFloat(location.lat).toFixed(4)}&`;
+              const lon = `lon=${parseFloat(location.lon).toFixed(4)}&`;
+              const api = `wsapikey=${WS_API_KEY}`;
+              const url = encodeURI(`http://api.walkscore.com/score?format=json&${address}${lat}${lon}${api}`);
+              const response = await axios.get(url);
+              if (response.data.status === 1) {
+                const { walkscore } = response.data;
+                return walkscore;
+              }
+              else {
+                const walkscore = undefined;
+                return walkscore;
+              }
+            }
+
+          }
+          catch (err) {
+            console.log(err);
+          }
+        },
         getRecents: async (root, { num }) => {
           const reviewArr = [];
           const locationArr = [];
